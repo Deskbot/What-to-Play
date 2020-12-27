@@ -23,7 +23,7 @@ function main() {
     // default to CSV
     const csv = !args["json"];
 
-    if (!csv) {
+    if (csv) {
         console.log("TODO csv headers");
     }
 
