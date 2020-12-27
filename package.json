@@ -10,7 +10,9 @@
   },
   "files": [
     "/bin",
-    "/build",
+    "/build/**/*.js",
+    "/build/**/*.js.map",
+    "/build/**/*.d.ts",
     "/README.md"
   ],
   "bin": {
