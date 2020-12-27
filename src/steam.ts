@@ -9,17 +9,17 @@ export type SteamResults = {
     url: string,
 } | undefined;
 
-export async function getInfo(name: string): Promise<SteamResults> {
-    const searchUrl = `https://store.steampowered.com/search/?term=${name}`;
+export async function getInfo(game: string): Promise<SteamResults> {
+    const searchUrl = `https://store.steampowered.com/search/?term=${game}`;
 
     const searchPage = cheerio.load(await getPage(searchUrl));
 
     const searchResultRow = searchPage(".search_result_row").first();
-    const resultName = searchResultRow.find(".title").first().text();
+    const realName = searchResultRow.find(".title").first().text();
     const scoreUrl = searchResultRow.attr("href");
 
     if (searchResultRow.length === 0) return undefined;
-    if (!resultName) bug();
+    if (!realName) bug();
     if (!scoreUrl) bug();
 
     const storePage = cheerio.load(await getPage(scoreUrl));
@@ -28,7 +28,7 @@ export async function getInfo(name: string): Promise<SteamResults> {
     // no reviews
     if (reviewInfos.length < 2) {
         return {
-            name: resultName,
+            name: realName,
             recentScore: undefined,
             allTimeScore: undefined,
             url: scoreUrl,
@@ -39,7 +39,7 @@ export async function getInfo(name: string): Promise<SteamResults> {
     const allTimeScore = reviewRowToPercent(reviewInfos.get(1));
 
     return {
-        name: resultName,
+        name: realName,
         recentScore,
         allTimeScore,
         url: scoreUrl,
