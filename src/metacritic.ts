@@ -39,8 +39,8 @@ export async function getInfo(game: string, preferredPlatforms: string[]): Promi
     // get info about the target product
 
     const anchor = targetProduct.parent().find("a");
-    const name = anchor.text();
-    const scoreUrl = anchor.attr("href");
+    const name = anchor.text().trim();
+    const scoreUrl = "https://www.metacritic.com/" + anchor.attr("href");
 
     if (!scoreUrl) bug();
 
@@ -54,17 +54,19 @@ export async function getInfo(game: string, preferredPlatforms: string[]): Promi
             .find(".main_details") // different
             .find(".metascore_w")
             .find("span") // different
-            .text();
+            .text()
+            .trim();
 
-    const metascore = nonNaN(parseInt(metascoreStr), undefined);
+    const metascore = nonNaN(parseFloat(metascoreStr), undefined);
 
     const userscoreStr =
         scorePage(".product_scores")
             .find(".side_details") // different
             .find(".metascore_w")
-            .text();
+            .text()
+            .trim();
 
-    const userscore = nonNaN(parseInt(userscoreStr), undefined);
+    const userscore = nonNaN(parseFloat(userscoreStr), undefined);
 
     return {
         name,
@@ -76,5 +78,5 @@ export async function getInfo(game: string, preferredPlatforms: string[]): Promi
 
 function getMostPreferred(candidates: Iterator<string>, preferred: string[]): string {
     // if none match return the first one
-    return "TODO";
+    return candidates.next().value ?? "";
 }
