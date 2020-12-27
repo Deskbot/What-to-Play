@@ -8,8 +8,7 @@ export interface ResultJson {
     steam: steam.SteamResult | undefined;
 }
 
-export type ResultCSV = Record<
-    "Game"
+export type CsvHeaders = "Game"
     | "Steam Name"
     | "Steam URL"
     | "Steam All Time % Positive"
@@ -17,9 +16,21 @@ export type ResultCSV = Record<
     | "Metacritic Name"
     | "Metacritic URL"
     | "Metacritic Critic Score"
-    | "Metacritic User Score",
-    string
->;
+    | "Metacritic User Score";
+
+export type ResultCSV = Record<CsvHeaders, string>;
+
+export const csvHeaders: ReadonlyArray<CsvHeaders> = [
+    "Game",
+    "Steam Name",
+    "Steam URL",
+    "Steam All Time % Positive",
+    "Steam Recent % Positive",
+    "Metacritic Name",
+    "Metacritic URL",
+    "Metacritic Critic Score",
+    "Metacritic User Score",
+];
 
 export async function getData(game: string): Promise<ResultJson> {
     return {
@@ -37,7 +48,6 @@ export async function getCsv(game: string): Promise<string> {
     const buffer = [] as string[];
 
     const data = await getData(game);
-
     if (data === undefined) return "";
 
     const newData = {

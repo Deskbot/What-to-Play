@@ -3,7 +3,7 @@ import * as fs from "fs";
 import * as minimist from "minimist";
 import * as process from "process";
 import * as readline from "readline";
-import { getCsv, getJson } from "./result";
+import { csvHeaders, getCsv, getJson } from "./output";
 
 interface Printer {
     (game: string): void;
@@ -23,7 +23,7 @@ function main() {
     const csv = !args["json"];
 
     if (csv) {
-        console.log("TODO csv headers");
+        console.log(csvHeaders.join(","));
     }
 
     const resultToString = csv
