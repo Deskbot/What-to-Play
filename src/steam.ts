@@ -2,14 +2,14 @@
 import * as cheerio from "cheerio";
 import { bug, getPage, nonNaN } from "./util";
 
-export type SteamResults = {
+export type SteamResult = {
     name: string,
     recentScore: number | undefined,
     allTimeScore: number | undefined,
     url: string,
-} | undefined;
+};
 
-export async function getInfo(game: string): Promise<SteamResults> {
+export async function getInfo(game: string): Promise<SteamResult | undefined> {
     const searchUrl = `https://store.steampowered.com/search/?term=${game}`;
 
     const searchPage = cheerio.load(await getPage(searchUrl));

@@ -1,8 +1,10 @@
 
 import * as fs from "fs";
+import * as minimist from "minimist";
 import * as process from "process";
 import * as readline from "readline";
 import * as steam from "./steam";
+import { csvFriendly, printable } from "./util";
 
 try {
     main();
@@ -12,20 +14,53 @@ try {
 }
 
 function main() {
-    const file: string | undefined = process.argv[2];
+    const args = minimist(process.argv.slice(2));
+
+    const resultToString = args["json"] ? getJson : getCsv;
+    const print = async (game: string) => console.log(await resultToString(game));
+
+    const file = args._[0] as string | undefined; // first arg
 
     if (file) {
         fs.readFileSync(file)
             .toString()
             .split("\n")
-            .forEach(printGame);
+            .forEach(print);
     } else {
         readline.createInterface(process.stdin)
-            .on("line", printGame);
+            .on("line", print);
     }
 }
 
-export async function printGame(game: string) {
-    const result = await steam.getInfo(game);
-    console.log(result);
+export function getData(game: string): Promise<steam.SteamResult | undefined> {
+    return steam.getInfo(game);
+}
+
+export async function getJson(game: string): Promise<string> {
+    return JSON.stringify(await getData(game));
+}
+
+// WIP
+export async function getCsv(game: string): Promise<string> {
+    const buffer = [] as string[];
+
+    const data = await getData(game)
+
+    if (data === undefined) return "";
+
+    // iterate through in the same order every time guaranteed
+    const keys = Object.keys(data) as (keyof steam.SteamResult)[];
+
+    // add header line
+    buffer.push(keys.join(","));
+    buffer.push("\n");
+
+    for (const key of keys) {
+        buffer.push(csvFriendly(printable(data[key])));
+        buffer.push(",");
+    }
+
+    buffer.push("\n");
+
+    return buffer.join("");
 }

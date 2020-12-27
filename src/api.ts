@@ -1,2 +1,2 @@
-export { printGame } from "./main";
+export * from "./main";
 export * as steam from "./steam";
