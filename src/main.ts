@@ -19,6 +19,10 @@ try {
 function main() {
     const args = minimist(process.argv.slice(2));
 
+    if (args["h"] || args["help"]) {
+        return printHelp();
+    }
+
     // default to CSV
     const csv = !args["json"];
 
@@ -42,4 +46,12 @@ function main() {
         readline.createInterface(process.stdin)
             .on("line", print);
     }
+}
+
+function printHelp() {
+    console.log("Usage: command (file name)? (argument)*");
+    console.log("");
+    console.log("arguments:")
+    console.log("-h | --help : print help");
+    console.log("--json      : output in JSON format (defaults to CSV)");
 }
