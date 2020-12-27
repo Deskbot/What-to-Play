@@ -2,20 +2,30 @@
 import * as fs from "fs";
 import * as process from "process";
 import * as readline from "readline";
+import * as steam from "./steam";
 
-main();
+try {
+    main();
+} catch (err) {
+    console.error(err);
+    process.exit(1);
+}
 
 function main() {
     const file: string | undefined = process.argv[2];
 
     if (file) {
-        const games = fs.readFileSync(file)
+        fs.readFileSync(file)
             .toString()
-            .split("\n");
+            .split("\n")
+            .forEach(printGame);
     } else {
-        const rl = readline.createInterface(process.stdin);
-        rl.on("line", line => {
-
-        });
+        readline.createInterface(process.stdin)
+            .on("line", printGame);
     }
+}
+
+export async function printGame(game: string) {
+    const result = await steam.getInfo(game);
+    console.log(result);
 }

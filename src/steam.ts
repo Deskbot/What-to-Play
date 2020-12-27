@@ -1,19 +1,15 @@
 
 import * as cheerio from "cheerio";
-import { bug, getPage } from "./util";
-
-export enum SteamError {
-    NoSearchResult
-}
+import { bug, getPage, nonNaN } from "./util";
 
 export type SteamResults = {
     name: string,
-    recentScore: number,
-    allTimeScore: number,
+    recentScore: number | undefined,
+    allTimeScore: number | undefined,
     url: string,
-} | SteamError;
+} | undefined;
 
-export async function getScore(name: string): Promise<SteamResults> {
+export async function getInfo(name: string): Promise<SteamResults> {
     const searchUrl = `https://store.steampowered.com/search/?term=${name}`;
 
     const searchPage = cheerio.load(await getPage(searchUrl));
@@ -22,7 +18,7 @@ export async function getScore(name: string): Promise<SteamResults> {
     const resultName = searchResultRow.find(".title").first().text();
     const scoreUrl = searchResultRow.attr("href");
 
-    if (!searchResultRow) return SteamError.NoSearchResult;
+    if (!searchResultRow) return undefined;
     if (!resultName) bug();
     if (!scoreUrl) bug();
 
@@ -34,8 +30,8 @@ export async function getScore(name: string): Promise<SteamResults> {
 
     return {
         name: resultName,
-        recentScore: recentReviewPercent,
-        allTimeScore: allReviewsPercent,
+        recentScore: nonNaN(recentReviewPercent, undefined),
+        allTimeScore: nonNaN(allReviewsPercent, undefined),
         url: scoreUrl,
     };
 }

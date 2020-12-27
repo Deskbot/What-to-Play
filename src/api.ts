@@ -1,0 +1,1 @@
+export { printGame } from "./main";

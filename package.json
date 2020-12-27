@@ -5,8 +5,8 @@
   "main": "build/api.js",
   "types": "build",
   "scripts": {
-    "build": "tsc",
-    "main": "./bin/what-to-play"
+    "build": "tsc -i",
+    "main": "npm run build && ./bin/what-to-play"
   },
   "files": [
     "/bin",
