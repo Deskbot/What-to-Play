@@ -52,6 +52,7 @@ function printHelp() {
     console.log("Usage: command (file name)? (argument)*");
     console.log("");
     console.log("arguments:")
-    console.log("-h | --help : print help");
-    console.log("--json      : output in JSON format (defaults to CSV)");
+    console.log("-h | --help      : Print help.");
+    console.log("-p | --platforms : A comma separated list of platforms. When the score differs by platform, the best score is chosen (defaults to all platforms).");
+    console.log("--json           : Output in JSON format (defaults to CSV).");
 }
