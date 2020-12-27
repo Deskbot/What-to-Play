@@ -3,7 +3,10 @@
         "Elem",
         "Elems",
         "Metacritic",
+        "dreamcast",
+        "gamecube",
         "metascore",
+        "playstation",
         "userscore"
     ]
 }
