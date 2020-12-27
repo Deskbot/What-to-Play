@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "description": "Score aggregator for lists of games",
   "main": "build/api.js",
+  "types": "build",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
