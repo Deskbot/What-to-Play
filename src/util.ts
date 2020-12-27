@@ -1,26 +1,12 @@
 import { fail } from "assert";
-import * as https from "https";
+import fetch from "node-fetch";
 
 export function bug(): never {
     fail("bug");
 }
 
 export function getPage(url: string): Promise<string> {
-    return new Promise((resolve, reject) => {
-        const buffer = [] as string[];
-
-        const req = https.request(url, res => {
-            res.on("data", data => {
-                buffer.push(data);
-            });
-
-            res.on("close", () => {
-                resolve(buffer.join(""));
-            })
-        });
-
-        req.on("error", reject);
-    });
+    return fetch(url).then(res => res.text());
 }
 
 export function nonNaN<T>(num: number, fallback: T): number | T {
