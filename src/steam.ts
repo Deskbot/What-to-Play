@@ -1,6 +1,7 @@
 
 import * as cheerio from "cheerio";
-import { bug, getPage, nonNaN } from "./util";
+import fetch from "node-fetch";
+import { bug, nonNaN } from "./util";
 
 export type SteamResult = {
     name: string,
@@ -11,7 +12,6 @@ export type SteamResult = {
 
 export async function getInfo(game: string): Promise<SteamResult | undefined> {
     const searchUrl = `https://store.steampowered.com/search/?term=${game}`;
-
     const searchPage = cheerio.load(await getPage(searchUrl));
 
     const searchResultRow = searchPage(".search_result_row").first();
@@ -44,6 +44,14 @@ export async function getInfo(game: string): Promise<SteamResult | undefined> {
         allTimeScore,
         url: scoreUrl,
     };
+}
+
+function getPage(url: string): Promise<string> {
+    return fetch(url, {
+        headers: {
+            "Cookie": "birthtime=281318401" // bypass age restriction
+        }
+    }).then(res => res.text());
 }
 
 function reviewRowToPercent(r: any): number | undefined {

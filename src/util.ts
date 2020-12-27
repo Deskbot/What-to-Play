@@ -1,5 +1,4 @@
 import { fail } from "assert";
-import fetch from "node-fetch";
 
 export function bug(): never {
     fail("bug");
@@ -21,10 +20,6 @@ export function csvFriendly(s: string): string {
 export function printable(val: string | number | undefined): string {
     if (val === undefined) return "";
     return val.toString();
-}
-
-export function getPage(url: string): Promise<string> {
-    return fetch(url).then(res => res.text());
 }
 
 export function nonNaN<T>(num: number, fallback: T): number | T {
