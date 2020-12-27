@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "lib": ["ES2019"],
+        "module": "commonjs",
+        "outDir": "./build",
+        "sourceMap": true,
+        "strict": true,
+        "target": "ES2019"
+    },
+    "include": [
+        "src"
+    ]
+}

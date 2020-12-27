@@ -1,0 +1,37 @@
+{
+  "name": "what-to-play",
+  "version": "0.0.0",
+  "description": "Score aggregator for lists of games",
+  "main": "build/main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "files": [
+    "/bin",
+    "/build"
+  ],
+  "bin": {
+    "what-to-play": "./bin/what-to-play"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Deskbot/What-to-Play.git"
+  },
+  "keywords": [
+    "game",
+    "review"
+  ],
+  "author": "Thomas Richards",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Deskbot/What-to-Play/issues"
+  },
+  "homepage": "https://github.com/Deskbot/What-to-Play#readme",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.5"
+  },
+  "devDependencies": {
+    "@types/node": "^14.14.16",
+    "typescript": "^4.1.3"
+  }
+}
