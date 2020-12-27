@@ -18,29 +18,43 @@ export async function getInfo(name: string): Promise<SteamResults> {
     const resultName = searchResultRow.find(".title").first().text();
     const scoreUrl = searchResultRow.attr("href");
 
-    if (!searchResultRow) return undefined;
+    if (searchResultRow.length === 0) return undefined;
     if (!resultName) bug();
     if (!scoreUrl) bug();
 
     const storePage = cheerio.load(await getPage(scoreUrl));
-    const reviewInfos = storePage(".user_reviews_summary_row")
+    const reviewInfos = storePage(".user_reviews_summary_row");
 
-    const recentReviewPercent = reviewRowToPercent(reviewInfos.get(0));
-    const allReviewsPercent = reviewRowToPercent(reviewInfos.get(1));
+    // no reviews
+    if (reviewInfos.length < 2) {
+        return {
+            name: resultName,
+            recentScore: undefined,
+            allTimeScore: undefined,
+            url: scoreUrl,
+        };
+    }
+
+    const recentScore = reviewRowToPercent(reviewInfos.get(0));
+    const allTimeScore = reviewRowToPercent(reviewInfos.get(1));
 
     return {
         name: resultName,
-        recentScore: nonNaN(recentReviewPercent, undefined),
-        allTimeScore: nonNaN(allReviewsPercent, undefined),
+        recentScore,
+        allTimeScore,
         url: scoreUrl,
     };
 }
 
-function reviewRowToPercent(row: cheerio.Cheerio): number {
-    const recentReviewText = row.attr("data-tooltip-html") as string;
+function reviewRowToPercent(row: cheerio.TagElement): number | undefined {
+    if (!row.attribs || !row.attribs["data-tooltip-html"]) {
+        return undefined;
+    }
+
+    const recentReviewText = row.attribs["data-tooltip-html"] as string;
 
     // the percent is at the start and consists of up to 3 characters followed by a % sign
     const recentReviewPercentStr = recentReviewText.substr(0, 3).replace(/[^0-9]/g, "");
 
-    return parseInt(recentReviewPercentStr);
+    return nonNaN(parseInt(recentReviewPercentStr), undefined);
 }
