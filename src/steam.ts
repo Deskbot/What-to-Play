@@ -4,10 +4,10 @@ import fetch from "node-fetch";
 import { bug, nonNaN } from "./util";
 
 export type SteamResult = {
-    name: string,
-    recentScore: number | undefined,
-    allTimeScore: number | undefined,
-    url: string,
+    name: string;
+    recentScore: number | undefined;
+    allTimeScore: number | undefined;
+    url: string;
 };
 
 export async function getInfo(game: string): Promise<SteamResult | undefined> {
