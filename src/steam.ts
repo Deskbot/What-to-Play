@@ -46,15 +46,20 @@ export async function getInfo(game: string): Promise<SteamResults> {
     };
 }
 
-function reviewRowToPercent(row: cheerio.TagElement): number | undefined {
-    if (!row.attribs || !row.attribs["data-tooltip-html"]) {
+function reviewRowToPercent(r: any): number | undefined {
+    if (!r.attribs || !r.attribs["data-tooltip-html"]) {
+        // some steam store pages have no reviews
         return undefined;
     }
 
-    const recentReviewText = row.attribs["data-tooltip-html"] as string;
+    const row = r as cheerio.TagElement;
+
+    const recentReviewText = row.attribs["data-tooltip-html"];
 
     // the percent is at the start and consists of up to 3 characters followed by a % sign
-    const recentReviewPercentStr = recentReviewText.substr(0, 3).replace(/[^0-9]/g, "");
+    const recentReviewPercentStr = recentReviewText
+        .substr(0, 3)
+        .replace(/[^0-9]/g, "");
 
     return nonNaN(parseInt(recentReviewPercentStr), undefined);
 }
