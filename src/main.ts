@@ -6,6 +6,10 @@ import * as readline from "readline";
 import * as steam from "./steam";
 import { csvFriendly, printable } from "./util";
 
+interface Printer {
+    (game: string): void;
+}
+
 try {
     main();
 } catch (err) {
@@ -16,8 +20,17 @@ try {
 function main() {
     const args = minimist(process.argv.slice(2));
 
-    const resultToString = args["json"] ? getJson : getCsv;
-    const print = async (game: string) => console.log(await resultToString(game));
+    // default to CSV
+    const csv = !args["json"];
+
+    if (!csv) {
+        console.log("TODO csv headers");
+    }
+
+    const resultToString = csv
+        ? getCsv
+        : getJson;
+    const print: Printer = game => resultToString(game).then(console.log);
 
     const file = args._[0] as string | undefined; // first arg
 
@@ -50,10 +63,6 @@ export async function getCsv(game: string): Promise<string> {
 
     // iterate through in the same order every time guaranteed
     const keys = Object.keys(data) as (keyof steam.SteamResult)[];
-
-    // add header line
-    buffer.push(keys.join(","));
-    buffer.push("\n");
 
     for (const key of keys) {
         buffer.push(csvFriendly(printable(data[key])));
