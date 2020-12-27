@@ -25,18 +25,25 @@ export async function getInfo(game: string): Promise<SteamResult | undefined> {
     const storePage = cheerio.load(await getPage(scoreUrl));
     const reviewInfos = storePage(".user_reviews_summary_row");
 
-    // no reviews
-    if (reviewInfos.length < 2) {
-        return {
-            name: realName,
-            recentScore: undefined,
-            allTimeScore: undefined,
-            url: scoreUrl,
-        };
+    let recentScore: number | undefined;
+    let allTimeScore: number | undefined;
+
+    // no review data e.g. unreleased game
+    if (reviewInfos.length === 0) {
+        recentScore = undefined;
+        allTimeScore = undefined;
     }
 
-    const recentScore = reviewRowToPercent(reviewInfos.get(0));
-    const allTimeScore = reviewRowToPercent(reviewInfos.get(1));
+    // game is recently released
+    else if (reviewInfos.length === 1) {
+        recentScore = reviewRowToPercent(reviewInfos.get(0));
+        allTimeScore = recentScore;
+    }
+
+    else {
+        recentScore = reviewRowToPercent(reviewInfos.get(0));
+        allTimeScore = reviewRowToPercent(reviewInfos.get(1));
+    }
 
     return {
         name: realName,
