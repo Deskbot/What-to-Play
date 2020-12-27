@@ -2,7 +2,7 @@
   "name": "what-to-play",
   "version": "0.0.0",
   "description": "Score aggregator for lists of games",
-  "main": "build/main.js",
+  "main": "build/api.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
