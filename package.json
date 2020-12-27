@@ -9,7 +9,8 @@
   },
   "files": [
     "/bin",
-    "/build"
+    "/build",
+    "/README.md"
   ],
   "bin": {
     "what-to-play": "./bin/what-to-play"
