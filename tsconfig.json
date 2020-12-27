@@ -1,5 +1,6 @@
 {
     "compilerOptions": {
+        "declaration": true,
         "lib": ["ES2019"],
         "module": "commonjs",
         "outDir": "./build",
