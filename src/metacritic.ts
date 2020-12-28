@@ -58,7 +58,7 @@ export const platforms: ReadonlyMap<RegExp, MetacriticPlatform> = new Map([
     [/^(sega.*)?dreamcast$/i, "dreamcast"],
 ]);
 
-export async function getInfo(game: string, preferredPlatforms: MetacriticPlatform[]): Promise<MetacriticResult | undefined> {
+export async function getInfo(game: string, platforms: MetacriticPlatform[]): Promise<MetacriticResult | undefined> {
     const searchUrl = `https://www.metacritic.com/search/game/${game}/results`;
 
     const searchPageText = await fetch(searchUrl).then(res => res.text());
@@ -66,38 +66,32 @@ export async function getInfo(game: string, preferredPlatforms: MetacriticPlatfo
 
     // choose one of the products found on the search page:
 
-    let products = searchPage(".main_stats");
+    const product = searchPage(".main_stats").first();
 
-    const platformData = new Map<string,cheerio.Cheerio>();
-
-    while (products.length > 0) {
-        const product = products.first();
-        const platform = product.parent().find(".platform").text();
-
-        // don't overwrite a higher up result
-        if (!platformData.has(platform)) {
-            platformData.set(platform, product);
-        }
-
-        products = products.next();
-    }
-
-    const targetPlatform = getMostPreferred(platformData.keys(), preferredPlatforms);
-    const targetProduct = platformData.get(targetPlatform)!;
-
-    // get info about the target product
-
-    const anchor = targetProduct.parent().find("a");
+    const anchor = product.parent().find("a");
     const name = anchor.text().trim();
     const scoreUrl = "https://www.metacritic.com/" + anchor.attr("href");
+    // const platform = anchor.attr("href")?.split("/")[2]; // looks like: /game/platform-name/game-name
 
     if (!scoreUrl) bug();
 
-    // get score
+    const { metascore, userscore } = await getScoresByUrl(scoreUrl);
 
+    return {
+        name,
+        url: scoreUrl,
+        metascore,
+        userscore,
+    };
+}
+
+async function getScoresByUrl(scoreUrl: string): Promise<Pick<MetacriticResult, "metascore" | "userscore">> {
     const scorePageText = await fetch(scoreUrl).then(res => res.text());
     const scorePage = cheerio.load(scorePageText);
+    return getScores(scorePage);
+}
 
+async function getScores(scorePage: cheerio.Root): Promise<Pick<MetacriticResult, "metascore" | "userscore">> {
     const metascoreStr =
         scorePage(".product_scores")
             .find(".main_details") // different
@@ -118,16 +112,9 @@ export async function getInfo(game: string, preferredPlatforms: MetacriticPlatfo
     const userscore = nonNaN(parseFloat(userscoreStr), undefined);
 
     return {
-        name,
-        url: scoreUrl,
         metascore,
         userscore,
     };
-}
-
-function getMostPreferred(candidates: Iterator<string>, preferred: string[]): string {
-    // if none match return the first one
-    return candidates.next().value ?? "";
 }
 
 export function toPlatform(str: string): MetacriticPlatform | undefined {
