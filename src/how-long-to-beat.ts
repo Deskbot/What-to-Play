@@ -1,7 +1,7 @@
 import * as cheerio from "cheerio";
 import fetch from "node-fetch";
 import * as querystring from "querystring";
-import { bug, nonNaN } from "./util";
+import { bug } from "./util";
 
 export interface HowLongToBeatResult {
     name: string;
@@ -39,13 +39,14 @@ export async function getData(game: string): Promise<HowLongToBeatResult | undef
     const timeElems = searchResult
         .find(".search_list_details_block")
         .first()
-        .find(".time_100");
+        .find(".time_100")
+        .toArray();
 
-    if (timeElems.length === 0) bug();
+    if (timeElems.length !== 3) bug();
 
-    const mainStory = getTimeFromBlock(timeElems.get(0));
-    const mainPlusExtra = getTimeFromBlock(timeElems.get(1));
-    const completionist = getTimeFromBlock(timeElems.get(2));
+    const mainStory = getTimeFromElem(searchPage(timeElems[0]));
+    const mainPlusExtra = getTimeFromElem(searchPage(timeElems[1]));
+    const completionist = getTimeFromElem(searchPage(timeElems[2]));
 
     return {
         name,
@@ -56,12 +57,9 @@ export async function getData(game: string): Promise<HowLongToBeatResult | undef
     };
 }
 
-function getTimeFromBlock(block: any): number {
-    if (!block || typeof block.nodeValue !== "string") {
-        bug();
-    }
-
-    const timeStr = (block.nodeValue as string).replace("½", ".5");
-
-    return nonNaN(parseFloat(timeStr), bug());
+function getTimeFromElem(elem: cheerio.Cheerio): number {
+    const timeStr = elem.html()?.replace("½", ".5");
+    const time = parseFloat(timeStr as any); // undefined returns NaN
+    if (Number.isNaN(time)) bug();
+    return time;
 }

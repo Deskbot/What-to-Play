@@ -8,7 +8,7 @@
             "name": "Test",
             "preLaunchTask": "Build",
 
-            "program": "${workspaceRoot}/src/main.ts",
+            "program": "${workspaceFolder}/src/main.ts",
             "args": [
                 "--json"
             ],
