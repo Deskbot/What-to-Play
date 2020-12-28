@@ -14,34 +14,7 @@ export interface AllData {
     steam: steam.SteamResult | undefined;
 }
 
-export type CsvHeaders =
-    "Game"
-    | "Aggregate Score"
-    | "Steam Name"
-    | "Steam URL"
-    | "Steam All Time % Positive"
-    | "Steam Recent % Positive"
-    | "Metacritic Name"
-    | "Metacritic URL"
-    | "Metacritic Critic Score"
-    | "Metacritic Critic Score URL"
-    | "Metacritic User Score"
-    | "Metacritic User Score URL"
-    | "GOG Name"
-    | "GOG URL"
-    | "GOG Score"
-    | "How Long to Beat Name"
-    | "How Long to Beat URL"
-    | "How Long to Beat: Main Story"
-    | "How Long to Beat: Main Story + Extra"
-    | "How Long to Beat: Completionist"
-    | "How Long to Beat: Solo"
-    | "How Long to Beat: Co-Op"
-    | "How Long to Beat: Vs.";
-
-export type ResultCSV = Record<CsvHeaders, string>;
-
-export const csvHeaders: ReadonlyArray<CsvHeaders> = [
+export const csvHeaders = [
     "Game",
     "Aggregate Score",
     "Steam Name",
@@ -65,7 +38,10 @@ export const csvHeaders: ReadonlyArray<CsvHeaders> = [
     "How Long to Beat: Solo",
     "How Long to Beat: Co-Op",
     "How Long to Beat: Vs.",
-];
+] as const;
+
+export type CsvHeaders = typeof csvHeaders[number];
+export type ResultCSV = Record<CsvHeaders, string>;
 
 export async function getData(game: string, platforms: MetacriticPlatform[]): Promise<AllData> {
     const gogData = await gog.getData(game);
