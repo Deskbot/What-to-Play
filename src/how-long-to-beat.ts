@@ -7,13 +7,14 @@ export interface HowLongToBeatResult {
     mainStory: number;
     mainPlusExtra: number;
     completionist: number;
+    url: string;
 }
 
 export async function getData(game: string): Promise<HowLongToBeatResult | undefined> {
-    const url = "https://howlongtobeat.com/search_results?page=1";
+    const searchUrl = "https://howlongtobeat.com/search_results?page=1";
     const postData = `queryString=${game}&t=games&sorthead=popular&sortd=Normal Order`;
 
-    const html = await fetch(url, {
+    const html = await fetch(searchUrl, {
         method: "POST",
         body: postData
     })
@@ -24,12 +25,14 @@ export async function getData(game: string): Promise<HowLongToBeatResult | undef
 
     if (searchResult.length === 0) return undefined;
 
-    const name = searchResult
+    const nameElem = searchResult
         .find("a")
-        .first()
-        .text();
+        .first();
 
+    const name = nameElem.text();
     if (!name) bug();
+
+    const url = "https://howlongtobeat.com/" + nameElem.attr("href");
 
     const timeElems = searchResult
         .find(".search_list_details_block")
@@ -47,6 +50,7 @@ export async function getData(game: string): Promise<HowLongToBeatResult | undef
         mainStory,
         mainPlusExtra,
         completionist,
+        url,
     };
 }
 
