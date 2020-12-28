@@ -27,10 +27,7 @@ export async function getData(game: string): Promise<HowLongToBeatResult | undef
 
     if (searchResult.length === 0) return undefined;
 
-    const nameElem = searchResult
-        .find("a")
-        .first();
-
+    const nameElem = searchResult.find("a").first();
     const name = nameElem.text();
     if (!name) bug();
 
