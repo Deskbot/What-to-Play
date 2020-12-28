@@ -18,7 +18,9 @@ export type CsvHeaders =
     | "Metacritic Name"
     | "Metacritic URL"
     | "Metacritic Critic Score"
-    | "Metacritic User Score";
+    | "Metacritic Critic Score URL"
+    | "Metacritic User Score"
+    | "Metacritic User Score URL";
 
 export type ResultCSV = Record<CsvHeaders, string>;
 
@@ -31,7 +33,9 @@ export const csvHeaders: ReadonlyArray<CsvHeaders> = [
     "Metacritic Name",
     "Metacritic URL",
     "Metacritic Critic Score",
+    "Metacritic Critic Score URL",
     "Metacritic User Score",
+    "Metacritic User Score URL",
 ];
 
 export async function getData(game: string, platforms: MetacriticPlatform[]): Promise<ResultJson> {
@@ -54,14 +58,16 @@ export async function getCsv(game: string, platforms: MetacriticPlatform[]): Pro
 
     const newData = {
         "Game": data.game,
-        "Steam Name": data.steam?.name ?? "",
-        "Steam URL": data.steam?.url ?? "",
-        "Steam All Time % Positive": data.steam?.allTimeScore ?? "",
-        "Steam Recent % Positive": data.steam?.recentScore ?? "",
-        "Metacritic Name": data.metacritic?.name ?? "",
-        "Metacritic URL": data.metacritic?.url ?? "",
-        "Metacritic Critic Score": data.metacritic?.metascore ?? "",
-        "Metacritic User Score": data.metacritic?.userscore ?? "",
+        "Steam Name": data.steam?.name,
+        "Steam URL": data.steam?.url,
+        "Steam All Time % Positive": data.steam?.allTimeScore,
+        "Steam Recent % Positive": data.steam?.recentScore,
+        "Metacritic Name": data.metacritic?.name,
+        "Metacritic URL": data.metacritic?.url,
+        "Metacritic Critic Score": data.metacritic?.metascore,
+        "Metacritic User Score": data.metacritic?.userscore,
+        "Metacritic Critic Score URL": data.metacritic?.metascoreUrl,
+        "Metacritic User Score URL": data.metacritic?.userScoreUrl,
     };
 
     // iterate through in the same order every time guaranteed

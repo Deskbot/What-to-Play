@@ -1,5 +1,9 @@
 import { fail } from "assert";
 
+export async function awaitPair<A,B>([a, promiseB]: [A, Promise<B>]): Promise<[A, B]> {
+    return [a, await promiseB];
+}
+
 export function bug(): never {
     fail("bug");
 }

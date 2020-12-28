@@ -1,13 +1,17 @@
 import * as cheerio from "cheerio";
 import fetch from "node-fetch";
-import { bug, nonNaN } from "./util";
+import { awaitPair, bug, nonNaN } from "./util";
 
 export interface MetacriticResult {
     name: string;
     url: string;
     metascore: number | undefined;
     userscore: number | undefined;
+    metascoreUrl: string | undefined;
+    userScoreUrl: string | undefined;
 }
+
+type BothScores = Pick<MetacriticResult, "metascore" | "userscore">;
 
 export type MetacriticPlatform =
     "playstation-5"
@@ -79,21 +83,21 @@ export async function getInfo(game: string, platforms: MetacriticPlatform[]): Pr
 
     // determine scores
 
-    const scoreUrl = absoluteUrl(href);
-    if (!scoreUrl) bug();
+    const reviewUrl = absoluteUrl(href);
+    if (!reviewUrl) bug();
 
-    const scorePageText = await fetch(scoreUrl).then(res => res.text());
-    const reviewPage = cheerio.load(scorePageText);
+    const reviewPageText = await fetch(reviewUrl).then(res => res.text());
+    const reviewPage = cheerio.load(reviewPageText);
 
     // get promises that return the score on each wanted platform
 
     // get other review pages for other platforms from the initial review page
     const scorePromises = getOtherPlatformUrls(reviewPage, platforms)
-        .map(getScoresByUrl);
+        .map(url => awaitPair([url, getScoresByUrl(url)]));
 
     const startingPlatform = platformFromUrl(href);
     if (platforms.includes(startingPlatform)) {
-        scorePromises.push(getScores(reviewPage));
+        scorePromises.push(awaitPair([reviewUrl, getScores(reviewPage)]));
     }
 
     // aggregate scores from all platforms
@@ -102,24 +106,30 @@ export async function getInfo(game: string, platforms: MetacriticPlatform[]): Pr
 
     let metascoreMax: number | undefined;
     let userscoreMax: number | undefined;
+    let bestMetascoreUrl: string | undefined;
+    let bestUserscoreUrl: string | undefined;
 
-    for (const { metascore, userscore } of scores) {
+    for (const [url, { metascore, userscore }] of scores) {
         // undefined compared (> or <) with undefined or with a number
         // always results in false
 
         if ((metascore as number) > (metascoreMax as number) || metascoreMax === undefined) {
             metascoreMax = metascore;
+            bestMetascoreUrl = url;
         }
         if ((userscore as number) > (userscoreMax as number) || userscoreMax === undefined) {
             userscoreMax = userscore;
+            bestUserscoreUrl = url;
         }
     }
 
     return {
         name,
-        url: scoreUrl,
+        url: reviewUrl,
         metascore: metascoreMax,
         userscore: userscoreMax,
+        metascoreUrl: bestMetascoreUrl,
+        userScoreUrl: bestUserscoreUrl,
     };
 }
 
@@ -144,13 +154,13 @@ function getOtherPlatformUrls(page: cheerio.Root, platforms: MetacriticPlatform[
     return urls;
 }
 
-async function getScoresByUrl(scoreUrl: string): Promise<Pick<MetacriticResult, "metascore" | "userscore">> {
+async function getScoresByUrl(scoreUrl: string): Promise<BothScores> {
     const scorePageText = await fetch(scoreUrl).then(res => res.text());
     const scorePage = cheerio.load(scorePageText);
     return getScores(scorePage);
 }
 
-async function getScores(scorePage: cheerio.Root): Promise<Pick<MetacriticResult, "metascore" | "userscore">> {
+async function getScores(scorePage: cheerio.Root): Promise<BothScores> {
     const metascoreStr =
         scorePage(".product_scores")
             .find(".main_details") // different
