@@ -6,8 +6,16 @@ import { awaitPair, bug, nonNaN } from "./util";
 export interface MetacriticResult {
     name: string;
     url: string;
+
+    /**
+     * can assume that if metascore is present, the corresponding url will be present
+     */
     metascore?: number;
+    /**
+     * can assume that if userscore is present, the corresponding url will be present
+     */
     userscore?: number;
+
     metascoreUrl?: string;
     userscoreUrl?: string;
 }

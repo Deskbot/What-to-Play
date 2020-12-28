@@ -3,7 +3,7 @@ import * as hltb from "./how-long-to-beat";
 import * as metacritic from "./metacritic";
 import * as steam from "./steam";
 import { MetacriticPlatform } from "./metacritic";
-import { average, csvFriendly, escapeDoubleQuotes, printable } from "./util";
+import { average, bindUndefined, csvFriendly, escapeDoubleQuotes, printable } from "./util";
 
 export interface AllData {
     game: string;
@@ -78,29 +78,19 @@ export async function getCsv(game: string, platforms: MetacriticPlatform[]): Pro
     const newData = {
         "Game": data.game,
         "Aggregate Score": data.aggregateScore,
-        "Steam Name": data.steam
-            ? toHyperlink(data.steam.url, data.steam.name)
-            : undefined,
+        "Steam Name": bindUndefined(data.steam, s => toHyperlink(s.url, s.name)),
         "Steam All Time % Positive": data.steam?.allTimeScore,
         "Steam Recent % Positive": data.steam?.recentScore,
-        "Metacritic Name": data.metacritic
-            ? toHyperlink(data.metacritic.url, data.metacritic.name)
-            : undefined,
-        // can assume that if there's a score, there will be a corresponding url
+        "Metacritic Name": bindUndefined(data.metacritic, m => toHyperlink(m.url, m.name)),
         "Metacritic Critic Score": data.metacritic?.metascore
             ? toHyperlink(data.metacritic.metascoreUrl!, data.metacritic.metascore)
             : undefined,
-        // can assume that if there's a score, there will be a corresponding url
         "Metacritic User Score": data.metacritic?.userscore
             ? toHyperlink(data.metacritic.userscoreUrl!, data.metacritic.userscore)
             : undefined,
-        "GOG Name": data.gog
-            ? toHyperlink(data.gog.url, data.gog.name)
-            : undefined,
+        "GOG Name": bindUndefined(data.gog, g => toHyperlink(g.url, g.name)),
         "GOG Score": data.gog?.score,
-        "How Long to Beat Name": data.hltb
-            ? toHyperlink(data.hltb.url, data.hltb.name)
-            : undefined,
+        "How Long to Beat Name": bindUndefined(data.hltb, h => toHyperlink(h.url, h.name)),
         "How Long to Beat: Main Story": data.hltb?.times.mainStory,
         "How Long to Beat: Main Story + Extra": data.hltb?.times.mainPlusExtra,
         "How Long to Beat: Completionist": data.hltb?.times.completionist,

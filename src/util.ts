@@ -15,6 +15,11 @@ export async function awaitPair<A,B>([a, promiseB]: [A, Promise<B>]): Promise<[A
     return [a, await promiseB];
 }
 
+export function bindUndefined<T, U>(val: T | undefined, func: (val: T) => U): U | undefined {
+    if (val === undefined) return undefined;
+    return func(val);
+}
+
 export function bug(): never {
     fail("bug");
 }
