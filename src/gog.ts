@@ -1,9 +1,10 @@
+import * as cheerio from "cheerio";
 import fetch from "node-fetch";
-import { bug } from "./util";
+import { bug, nonNaN } from "./util";
 
 export interface GogResult {
     name: string;
-    score: number;
+    score: number | undefined;
     url: string;
 }
 
@@ -15,19 +16,36 @@ interface GogData {
     }[];
 }
 
+function absoluteUrl(relativeUrl: string): string {
+    return "https://www.gog.com" + relativeUrl;
+}
+
 export async function getData(game: string): Promise<GogResult | undefined> {
     const gogDataUrl = `https://www.gog.com/games/ajax/filtered?limit=1&search=${game}`;
 
-    const data = await fetch(gogDataUrl).then(res => res.json()) as Partial<GogData> | null;
-    const gameData = data?.products && data.products[0];
+    const searchData = await fetch(gogDataUrl).then(res => res.json()) as Partial<GogData> | null;
+    const gameData = searchData?.products && searchData.products[0];
 
     if (!gameData) return undefined;
+    if (typeof gameData.url !== "string") bug();
+    if (typeof gameData.title !== "string") bug();
 
-    const score = gameData.rating as number;
-    const url = gameData.url as string;
-    const name = gameData.title as string;
+    const url = absoluteUrl(gameData.url);
+    const name = gameData.title;
 
-    if (typeof score !== "number" || typeof url !== "string" || typeof name !== "string") bug();
+    // get the score from the url because that's more reliable and accurate
+
+    const html = await fetch(url).then(res => res.text());
+    const gamePage = cheerio.load(html);
+
+    const scoreText = gamePage(".productcard-rating")
+        .first()
+        .find(".productcard-rating__score")
+        .text();
+
+    const score = scoreText
+        ? nonNaN(parseFloat(scoreText.split("/")[0]), undefined)
+        : undefined; // some pages don't have a score due to there not being enough ratings
 
     return {
         name,
