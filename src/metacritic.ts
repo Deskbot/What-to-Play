@@ -137,7 +137,7 @@ function getOtherPlatformUrls(page: cheerio.Root, platforms: MetacriticPlatform[
             const platform = platformFromUrl(href);
 
             if (platforms.includes(platform)) {
-                urls.push(href);
+                urls.push(absoluteUrl(href));
             }
         });
 
