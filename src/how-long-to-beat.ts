@@ -1,5 +1,6 @@
 import * as cheerio from "cheerio";
 import fetch from "node-fetch";
+import * as querystring from "querystring";
 import { bug, nonNaN } from "./util";
 
 export interface HowLongToBeatResult {
@@ -12,7 +13,8 @@ export interface HowLongToBeatResult {
 
 export async function getData(game: string): Promise<HowLongToBeatResult | undefined> {
     const searchUrl = "https://howlongtobeat.com/search_results?page=1";
-    const postData = `queryString=${game}&t=games&sorthead=popular&sortd=Normal Order`;
+    const gameStr = querystring.escape(game);
+    const postData = `queryString=${gameStr}&t=games&sorthead=popular&sortd=Normal Order`;
 
     const html = await fetch(searchUrl, {
         method: "POST",

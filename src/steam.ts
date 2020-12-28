@@ -1,6 +1,7 @@
 
 import * as cheerio from "cheerio";
 import fetch from "node-fetch";
+import * as querystring from "querystring";
 import { bug, nonNaN } from "./util";
 
 export type SteamResult = {
@@ -11,7 +12,8 @@ export type SteamResult = {
 };
 
 export async function getInfo(game: string): Promise<SteamResult | undefined> {
-    const searchUrl = `https://store.steampowered.com/search/?term=${game}`;
+    const gameStr = querystring.escape(game);
+    const searchUrl = `https://store.steampowered.com/search/?term=${gameStr}`;
     const searchPage = cheerio.load(await getPage(searchUrl));
 
     const searchResultRow = searchPage(".search_result_row").first();

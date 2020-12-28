@@ -1,5 +1,6 @@
 import * as cheerio from "cheerio";
 import fetch from "node-fetch";
+import * as querystring from "querystring";
 import { awaitPair, bug, nonNaN } from "./util";
 
 export interface MetacriticResult {
@@ -67,7 +68,8 @@ function absoluteUrl(relativeUrl: string): string {
 }
 
 export async function getInfo(game: string, platforms: MetacriticPlatform[]): Promise<MetacriticResult | undefined> {
-    const searchUrl = `https://www.metacritic.com/search/game/${game}/results`;
+    const gameStr = querystring.escape(game);
+    const searchUrl = `https://www.metacritic.com/search/game/${gameStr}/results`;
 
     const searchPageText = await fetch(searchUrl).then(res => res.text());
     const searchPage = cheerio.load(searchPageText);
