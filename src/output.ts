@@ -3,10 +3,11 @@ import * as hltb from "./how-long-to-beat";
 import * as metacritic from "./metacritic";
 import * as steam from "./steam";
 import { MetacriticPlatform } from "./metacritic";
-import { csvFriendly, printable } from "./util";
+import { average, csvFriendly, printable } from "./util";
 
-export interface ResultJson {
+export interface AllData {
     game: string;
+    aggregateScore: number | undefined;
     hltb: hltb.HowLongToBeatResult | undefined;
     gog: gog.GogResult | undefined;
     metacritic: metacritic.MetacriticResult | undefined;
@@ -15,6 +16,7 @@ export interface ResultJson {
 
 export type CsvHeaders =
     "Game"
+    | "Aggregate Score"
     | "Steam Name"
     | "Steam URL"
     | "Steam All Time % Positive"
@@ -41,6 +43,7 @@ export type ResultCSV = Record<CsvHeaders, string>;
 
 export const csvHeaders: ReadonlyArray<CsvHeaders> = [
     "Game",
+    "Aggregate Score",
     "Steam Name",
     "Steam URL",
     "Steam All Time % Positive",
@@ -64,12 +67,17 @@ export const csvHeaders: ReadonlyArray<CsvHeaders> = [
     "How Long to Beat: Vs.",
 ];
 
-export async function getData(game: string, platforms: MetacriticPlatform[]): Promise<ResultJson> {
+export async function getData(game: string, platforms: MetacriticPlatform[]): Promise<AllData> {
+    const gogData = await gog.getData(game);
+    const metacriticData = await metacritic.getInfo(game, platforms);
+    const steamData = await steam.getInfo(game);
+
     return {
         game,
-        gog: await gog.getData(game),
-        metacritic: await metacritic.getInfo(game, platforms),
-        steam: await steam.getInfo(game),
+        aggregateScore: aggregateScore(gogData, metacriticData, steamData),
+        gog: gogData,
+        metacritic: metacriticData,
+        steam: steamData,
         hltb: await hltb.getData(game),
     };
 }
@@ -85,6 +93,7 @@ export async function getCsv(game: string, platforms: MetacriticPlatform[]): Pro
 
     const newData = {
         "Game": data.game,
+        "Aggregate Score": data.aggregateScore,
         "Steam Name": data.steam?.name,
         "Steam URL": data.steam?.url,
         "Steam All Time % Positive": data.steam?.allTimeScore,
@@ -119,4 +128,40 @@ export async function getCsv(game: string, platforms: MetacriticPlatform[]): Pro
     buffer.push("\n");
 
     return buffer.join("");
+}
+
+function aggregateScore(
+    gogData?: gog.GogResult,
+    metacriticData?: metacritic.MetacriticResult,
+    steamResult?: steam.SteamResult,
+): number | undefined {
+    let scores = [] as number[];
+
+    const gog_score = gogData?.score;
+    const metacritic_metascore = metacriticData?.metascore;
+    const metacritic_userscore = metacriticData?.userscore;
+    const steam_allTimeScore = steamResult?.allTimeScore;
+    const steam_recentScore = steamResult?.recentScore;
+
+    if (gog_score !== undefined) {
+        scores.push(gog_score * 20);
+    }
+    if (metacritic_metascore !== undefined) {
+        scores.push(metacritic_metascore);
+    }
+    if (metacritic_userscore !== undefined) {
+        scores.push(metacritic_userscore * 10);
+    }
+    if (steam_allTimeScore !== undefined) {
+        scores.push(steam_allTimeScore);
+    }
+    if (steam_recentScore !== undefined) {
+        scores.push(steam_recentScore);
+    }
+
+    if (scores.length === undefined) {
+        return undefined;
+    }
+
+    return parseFloat(average(scores).toFixed(1));
 }

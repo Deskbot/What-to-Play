@@ -1,5 +1,16 @@
 import { fail } from "assert";
 
+export function average(arr: number[]): number {
+    let total = 0;
+    const len = arr.length;
+
+    for (let i = 0; i < len; i++) {
+        total += arr[i];
+    }
+
+    return total / len;
+}
+
 export async function awaitPair<A,B>([a, promiseB]: [A, Promise<B>]): Promise<[A, B]> {
     return [a, await promiseB];
 }
