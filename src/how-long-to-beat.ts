@@ -12,6 +12,8 @@ export interface HowLongToBeatResult {
 }
 
 export async function getData(game: string): Promise<HowLongToBeatResult | undefined> {
+    // search for game on the website
+
     const searchUrl = "https://howlongtobeat.com/search_results?page=1";
     const gameStr = querystring.escape(game);
     const postData = `queryString=${gameStr}&t=games&sorthead=popular&sortd=Normal Order`;
@@ -25,16 +27,20 @@ export async function getData(game: string): Promise<HowLongToBeatResult | undef
     })
     .then(res => res.text());
 
+    // get data about the game out of the results
+
     const searchPage = cheerio.load(html);
-    const searchResult = searchPage(".search_list_details").first();
+    const searchResult = searchPage(".search_list_details").first(); // only look at first result
 
     if (searchResult.length === 0) return undefined;
+
+    // get name
 
     const nameElem = searchResult.find("a").first();
     const name = nameElem.text();
     if (!name) bug();
 
-    const url = "https://howlongtobeat.com/" + nameElem.attr("href");
+    // get completion times
 
     const timeElems = searchResult
         .find(".search_list_details_block")
@@ -47,6 +53,9 @@ export async function getData(game: string): Promise<HowLongToBeatResult | undef
     const mainStory = getTimeFromElem(searchPage(timeElems[0]));
     const mainPlusExtra = getTimeFromElem(searchPage(timeElems[1]));
     const completionist = getTimeFromElem(searchPage(timeElems[2]));
+
+    // get url
+    const url = "https://howlongtobeat.com/" + nameElem.attr("href");
 
     return {
         name,
