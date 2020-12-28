@@ -95,6 +95,7 @@ export async function getInfo(game: string, platforms: MetacriticPlatform[]): Pr
     const scorePromises = getOtherPlatformUrls(reviewPage, platforms)
         .map(url => awaitPair([url, getScoresByUrl(url)]));
 
+    // add the starting page score if it is for a platform we want
     const startingPlatform = platformFromUrl(href);
     if (platforms.includes(startingPlatform)) {
         scorePromises.push(awaitPair([reviewUrl, getScores(reviewPage)]));
