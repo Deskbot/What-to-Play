@@ -9,7 +9,31 @@ export interface MetacriticResult {
     userscore: number | undefined;
 }
 
-export const platforms: ReadonlyArray<readonly [RegExp, string]> = [
+export type MetacriticPlatform =
+    "playstation-5"
+    | "playstation-4"
+    | "playstation-3"
+    | "playstation-2"
+    | "playstation"
+    | "playstation-vita"
+    | "psp"
+    | "xbox-series-x"
+    | "xbox-one"
+    | "xbox-360"
+    | "xbox"
+    | "pc"
+    | "switch"
+    | "wii-u"
+    | "wii"
+    | "gamecube"
+    | "nintendo-64"
+    | "3ds"
+    | "ds"
+    | "game-boy-advance"
+    | "ios"
+    | "dreamcast";
+
+export const platforms: ReadonlyMap<RegExp, MetacriticPlatform> = new Map([
     [/^(ps|playstation).*5$/i, "playstation-5"],
     [/^(ps|playstation).*4$/i, "playstation-4"],
     [/^(ps|playstation).*3$/i, "playstation-3"],
@@ -32,9 +56,9 @@ export const platforms: ReadonlyArray<readonly [RegExp, string]> = [
     [/^(nintendo.*)?(game.*boy.*advance|gba)$/i, "game-boy-advance"],
     [/^ios|android|mobile|(smart)?phone|tablet$/i, "ios"],
     [/^(sega.*)?dreamcast$/i, "dreamcast"],
-];
+]);
 
-export async function getInfo(game: string, preferredPlatforms: string[]): Promise<MetacriticResult | undefined> {
+export async function getInfo(game: string, preferredPlatforms: MetacriticPlatform[]): Promise<MetacriticResult | undefined> {
     const searchUrl = `https://www.metacritic.com/search/game/${game}/results`;
 
     const searchPageText = await fetch(searchUrl).then(res => res.text());
@@ -104,4 +128,14 @@ export async function getInfo(game: string, preferredPlatforms: string[]): Promi
 function getMostPreferred(candidates: Iterator<string>, preferred: string[]): string {
     // if none match return the first one
     return candidates.next().value ?? "";
+}
+
+export function toPlatform(str: string): MetacriticPlatform | undefined {
+    for (const [pattern, platform] of platforms) {
+        if (str.match(pattern)) {
+            return platform;
+        }
+    }
+
+    return undefined;
 }

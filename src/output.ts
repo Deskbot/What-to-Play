@@ -1,5 +1,6 @@
-import { metacritic } from "./api";
 import * as steam from "./steam";
+import * as metacritic from "./metacritic";
+import { MetacriticPlatform } from "./metacritic";
 import { csvFriendly, printable } from "./util";
 
 export interface ResultJson {
@@ -8,7 +9,8 @@ export interface ResultJson {
     steam: steam.SteamResult | undefined;
 }
 
-export type CsvHeaders = "Game"
+export type CsvHeaders =
+    "Game"
     | "Steam Name"
     | "Steam URL"
     | "Steam All Time % Positive"
@@ -32,22 +34,22 @@ export const csvHeaders: ReadonlyArray<CsvHeaders> = [
     "Metacritic User Score",
 ];
 
-export async function getData(game: string): Promise<ResultJson> {
+export async function getData(game: string, platforms: MetacriticPlatform[]): Promise<ResultJson> {
     return {
         game,
-        metacritic: await metacritic.getInfo(game, []),
+        metacritic: await metacritic.getInfo(game, platforms),
         steam: await steam.getInfo(game),
     };
 }
 
-export async function getJson(game: string): Promise<string> {
-    return JSON.stringify(await getData(game));
+export async function getJson(game: string, platforms: MetacriticPlatform[]): Promise<string> {
+    return JSON.stringify(await getData(game, platforms));
 }
 
-export async function getCsv(game: string): Promise<string> {
+export async function getCsv(game: string, platforms: MetacriticPlatform[]): Promise<string> {
     const buffer = [] as string[];
 
-    const data = await getData(game);
+    const data = await getData(game, platforms);
     if (data === undefined) return "";
 
     const newData = {

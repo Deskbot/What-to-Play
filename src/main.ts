@@ -1,8 +1,10 @@
 
 import * as fs from "fs";
+import * as metacritic from "./metacritic";
 import * as minimist from "minimist";
 import * as process from "process";
 import * as readline from "readline";
+import { MetacriticPlatform } from "./metacritic";
 import { csvHeaders, getCsv, getJson } from "./output";
 
 interface Printer {
@@ -30,10 +32,15 @@ function main() {
         console.log(csvHeaders.join(","));
     }
 
+    const givenPlatforms: string | undefined = args["-p"] || args["--platform"];
+    const platforms = givenPlatforms
+        ? parsePlatforms(givenPlatforms)
+        : [...metacritic.platforms.values()];
+
     const resultToString = csv
         ? getCsv
         : getJson;
-    const print: Printer = game => resultToString(game).then(console.log);
+    const print: Printer = game => resultToString(game, platforms).then(console.log);
 
     const file = args._[0] as string | undefined; // first arg
 
@@ -46,6 +53,19 @@ function main() {
         readline.createInterface(process.stdin)
             .on("line", print);
     }
+}
+
+function parsePlatforms(str: string): MetacriticPlatform[] {
+    const result = [] as MetacriticPlatform[];
+
+    for (const input of str.split(",")) {
+        const maybePlatform = metacritic.toPlatform(input.trim());
+        if (maybePlatform) {
+            result.push(maybePlatform);
+        }
+    }
+
+    return result;
 }
 
 function printHelp() {
