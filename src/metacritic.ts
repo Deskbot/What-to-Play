@@ -58,6 +58,10 @@ export const platforms: ReadonlyMap<RegExp, MetacriticPlatform> = new Map([
     [/^(sega.*)?dreamcast$/i, "dreamcast"],
 ]);
 
+function absoluteUrl(relativeUrl: string): string {
+    return "https://www.metacritic.com/" + relativeUrl;
+}
+
 export async function getInfo(game: string, platforms: MetacriticPlatform[]): Promise<MetacriticResult | undefined> {
     const searchUrl = `https://www.metacritic.com/search/game/${game}/results`;
 
@@ -70,19 +74,66 @@ export async function getInfo(game: string, platforms: MetacriticPlatform[]): Pr
 
     const anchor = product.parent().find("a");
     const name = anchor.text().trim();
-    const scoreUrl = "https://www.metacritic.com/" + anchor.attr("href");
-    // const platform = anchor.attr("href")?.split("/")[2]; // looks like: /game/platform-name/game-name
+    const href = anchor.attr("href");
+    if (!href) bug();
 
+    const scoreUrl = absoluteUrl(href);
     if (!scoreUrl) bug();
 
-    const { metascore, userscore } = await getScoresByUrl(scoreUrl);
+    const scorePageText = await fetch(scoreUrl).then(res => res.text());
+    const scorePage = cheerio.load(scorePageText);
+
+    const scoreUrls = getPlatformUrls(scorePage, platforms);
+
+    const scores = await Promise.all(scoreUrls.map(getScoresByUrl));
+
+    let metascoreMax: number | undefined;
+    let userscoreMax: number | undefined;
+
+    // todo check if the initial page is for a platform we want
+
+    for (const { metascore, userscore } of scores) {
+        if (metascoreMax === undefined
+            || (metascore !== undefined && metascore > metascoreMax)
+        ) {
+            metascoreMax = metascore;
+        }
+
+        if (userscoreMax === undefined
+            || (userscore !== undefined && userscore > userscoreMax)
+        ) {
+            userscoreMax = userscore;
+        }
+    }
 
     return {
         name,
         url: scoreUrl,
-        metascore,
-        userscore,
+        metascore: metascoreMax,
+        userscore: userscoreMax,
     };
+}
+
+function getPlatformUrls(page: cheerio.Root, platforms: MetacriticPlatform[]): string[] {
+    const urls = [] as string[];
+
+    page(".product_platforms")
+        .first()
+        .find("a")
+        .each((i, elem) => {
+            const tagElem = elem as cheerio.TagElement;
+            const href = tagElem.attribs && tagElem.attribs["href"];
+            if (!href) bug();
+
+            const platform = platformFromUrl(href);
+            if (!platform) bug();
+
+            if (platforms.includes(platform)) {
+                urls.push(href);
+            }
+        });
+
+    return urls;
 }
 
 async function getScoresByUrl(scoreUrl: string): Promise<Pick<MetacriticResult, "metascore" | "userscore">> {
@@ -115,6 +166,11 @@ async function getScores(scorePage: cheerio.Root): Promise<Pick<MetacriticResult
         metascore,
         userscore,
     };
+}
+
+/** url looks like: /game/platform-name/game-name */
+function platformFromUrl(url: string): MetacriticPlatform | undefined {
+    return url.split("/")[2] as MetacriticPlatform | undefined;
 }
 
 export function toPlatform(str: string): MetacriticPlatform | undefined {
