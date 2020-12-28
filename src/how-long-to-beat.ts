@@ -43,7 +43,7 @@ export async function getData(game: string): Promise<HowLongToBeatResult | undef
     // get completion times
 
     const timeElems = searchResult
-        .find(".search_list_details_block .search_list_tidbit")
+        .find(".search_list_tidbit")
         .toArray();
 
     if (timeElems.length !== 6) bug();
