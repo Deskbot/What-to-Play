@@ -25,7 +25,7 @@ export function csvFriendly(s: string): string {
         return s;
     }
 
-    // special characters are allowed inside double quotes
+    // special characters are only allowed inside double quotes
 
     s = s.replace("\"", "\"\""); // replace every double quote with two double quotes
 
