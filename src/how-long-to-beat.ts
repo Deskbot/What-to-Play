@@ -18,7 +18,10 @@ export async function getData(game: string): Promise<HowLongToBeatResult | undef
 
     const html = await fetch(searchUrl, {
         method: "POST",
-        body: postData
+        body: postData,
+        headers: {
+            "content-type": "application/x-www-form-urlencoded"
+        }
     })
     .then(res => res.text());
 
