@@ -77,8 +77,9 @@ export async function getInfo(game: string, platforms: MetacriticPlatform[]): Pr
     // choose one of the products found on the search page:
 
     const product = searchPage(".main_stats").first();
-
     const anchor = product.parent().find("a");
+    if (anchor.length === 0) return undefined;
+
     const name = anchor.text().trim();
     const href = anchor.attr("href");
     if (!href) bug();
