@@ -21,15 +21,20 @@ export function bug(): never {
 
 export function csvFriendly(s: string): string {
     // if no special characters, it's fine as is
-    if (!s.includes(",") && !s.includes("\n") && !s.includes("\"")) {
+    if (!s.includes(",") && !s.includes("\n") && !s.includes('"')) {
         return s;
     }
 
     // special characters are only allowed inside double quotes
 
-    s = s.replace("\"", "\"\""); // replace every double quote with two double quotes
+    s = escapeDoubleQuotes(s, '""');
 
     return `"${s}"`;
+}
+
+const allDoubleQuotes = /"/g;
+export function escapeDoubleQuotes(s: string, replacement: string): string {
+    return s.replace(allDoubleQuotes, replacement);
 }
 
 export function printable(val: string | number | undefined): string {

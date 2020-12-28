@@ -3,7 +3,7 @@ import * as hltb from "./how-long-to-beat";
 import * as metacritic from "./metacritic";
 import * as steam from "./steam";
 import { MetacriticPlatform } from "./metacritic";
-import { average, csvFriendly, printable } from "./util";
+import { average, csvFriendly, escapeDoubleQuotes, printable } from "./util";
 
 export interface AllData {
     game: string;
@@ -18,20 +18,14 @@ export const csvHeaders = [
     "Game",
     "Aggregate Score",
     "Steam Name",
-    "Steam URL",
     "Steam All Time % Positive",
     "Steam Recent % Positive",
     "Metacritic Name",
-    "Metacritic URL",
     "Metacritic Critic Score",
-    "Metacritic Critic Score URL",
     "Metacritic User Score",
-    "Metacritic User Score URL",
     "GOG Name",
-    "GOG URL",
     "GOG Score",
     "How Long to Beat Name",
-    "How Long to Beat URL",
     "How Long to Beat: Main Story",
     "How Long to Beat: Main Story + Extra",
     "How Long to Beat: Completionist",
@@ -42,6 +36,20 @@ export const csvHeaders = [
 
 export type CsvHeaders = typeof csvHeaders[number];
 export type ResultCSV = Record<CsvHeaders, string>;
+
+/**
+ * Based on common spreadsheet syntax.
+ */
+function toHyperlink(url: string, text: string | number): string {
+    // escape inputs to fit formula syntax
+    url = escapeDoubleQuotes(url, '""');
+
+    if (typeof text === "string") {
+        text = escapeDoubleQuotes(text, '""');
+    }
+
+    return `=HYPERLINK("${url}", "${text}")`;
+}
 
 export async function getData(game: string, platforms: MetacriticPlatform[]): Promise<AllData> {
     const gogData = await gog.getData(game);
@@ -70,21 +78,29 @@ export async function getCsv(game: string, platforms: MetacriticPlatform[]): Pro
     const newData = {
         "Game": data.game,
         "Aggregate Score": data.aggregateScore,
-        "Steam Name": data.steam?.name,
-        "Steam URL": data.steam?.url,
+        "Steam Name": data.steam
+            ? toHyperlink(data.steam.url, data.steam.name)
+            : undefined,
         "Steam All Time % Positive": data.steam?.allTimeScore,
         "Steam Recent % Positive": data.steam?.recentScore,
-        "Metacritic Name": data.metacritic?.name,
-        "Metacritic URL": data.metacritic?.url,
-        "Metacritic Critic Score": data.metacritic?.metascore,
-        "Metacritic User Score": data.metacritic?.userscore,
-        "Metacritic Critic Score URL": data.metacritic?.metascoreUrl,
-        "Metacritic User Score URL": data.metacritic?.userScoreUrl,
-        "GOG Name": data.gog?.name,
-        "GOG URL": data.gog?.url,
+        "Metacritic Name": data.metacritic
+            ? toHyperlink(data.metacritic.url, data.metacritic.name)
+            : undefined,
+        // can assume that if there's a score, there will be a corresponding url
+        "Metacritic Critic Score": data.metacritic?.metascore
+            ? toHyperlink(data.metacritic.metascoreUrl!, data.metacritic.metascore)
+            : undefined,
+        // can assume that if there's a score, there will be a corresponding url
+        "Metacritic User Score": data.metacritic?.userscore
+            ? toHyperlink(data.metacritic.userscoreUrl!, data.metacritic.userscore)
+            : undefined,
+        "GOG Name": data.gog
+            ? toHyperlink(data.gog.url, data.gog.name)
+            : undefined,
         "GOG Score": data.gog?.score,
-        "How Long to Beat Name": data.hltb?.name,
-        "How Long to Beat URL": data.hltb?.url,
+        "How Long to Beat Name": data.hltb
+            ? toHyperlink(data.hltb.url, data.hltb.name)
+            : undefined,
         "How Long to Beat: Main Story": data.hltb?.times.mainStory,
         "How Long to Beat: Main Story + Extra": data.hltb?.times.mainPlusExtra,
         "How Long to Beat: Completionist": data.hltb?.times.completionist,

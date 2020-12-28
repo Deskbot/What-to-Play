@@ -9,7 +9,7 @@ export interface MetacriticResult {
     metascore?: number;
     userscore?: number;
     metascoreUrl?: string;
-    userScoreUrl?: string;
+    userscoreUrl?: string;
 }
 
 type BothScores = Pick<MetacriticResult, "metascore" | "userscore">;
@@ -133,7 +133,7 @@ export async function getInfo(game: string, platforms: MetacriticPlatform[]): Pr
         metascore: metascoreMax,
         userscore: userscoreMax,
         metascoreUrl: bestMetascoreUrl,
-        userScoreUrl: bestUserscoreUrl,
+        userscoreUrl: bestUserscoreUrl,
     };
 }
 
