@@ -7,11 +7,11 @@ import { average, csvFriendly, printable } from "./util";
 
 export interface AllData {
     game: string;
-    aggregateScore: number | undefined;
-    hltb: hltb.HowLongToBeatResult | undefined;
-    gog: gog.GogResult | undefined;
-    metacritic: metacritic.MetacriticResult | undefined;
-    steam: steam.SteamResult | undefined;
+    aggregateScore?: number;
+    hltb?: hltb.HowLongToBeatResult;
+    gog?: gog.GogResult;
+    metacritic?: metacritic.MetacriticResult;
+    steam?: steam.SteamResult;
 }
 
 export const csvHeaders = [
@@ -94,7 +94,7 @@ export async function getCsv(game: string, platforms: MetacriticPlatform[]): Pro
     };
 
     // iterate through in the same order every time guaranteed
-    const keys = Object.keys(newData) as (keyof ResultCSV)[];
+    const keys = Object.keys(newData) as CsvHeaders[];
 
     for (const key of keys) {
         buffer.push(csvFriendly(printable(newData[key])));

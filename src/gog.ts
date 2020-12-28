@@ -5,7 +5,7 @@ import { bug, nonNaN } from "./util";
 
 export interface GogResult {
     name: string;
-    score: number | undefined;
+    score?: number;
     url: string;
 }
 

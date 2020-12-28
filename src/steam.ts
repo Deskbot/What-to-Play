@@ -6,8 +6,8 @@ import { bug, nonNaN } from "./util";
 
 export type SteamResult = {
     name: string;
-    recentScore: number | undefined;
-    allTimeScore: number | undefined;
+    recentScore?: number;
+    allTimeScore?: number;
     url: string;
 };
 

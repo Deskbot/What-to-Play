@@ -6,10 +6,10 @@ import { awaitPair, bug, nonNaN } from "./util";
 export interface MetacriticResult {
     name: string;
     url: string;
-    metascore: number | undefined;
-    userscore: number | undefined;
-    metascoreUrl: string | undefined;
-    userScoreUrl: string | undefined;
+    metascore?: number;
+    userscore?: number;
+    metascoreUrl?: string;
+    userScoreUrl?: string;
 }
 
 type BothScores = Pick<MetacriticResult, "metascore" | "userscore">;
