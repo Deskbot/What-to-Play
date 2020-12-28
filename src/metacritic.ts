@@ -169,8 +169,6 @@ async function getScores(scorePage: cheerio.Root): Promise<BothScores> {
             .text()
             .trim();
 
-    const metascore = nonNaN(parseFloat(metascoreStr), undefined);
-
     const userscoreStr =
         scorePage(".product_scores")
             .find(".side_details") // different
@@ -178,11 +176,9 @@ async function getScores(scorePage: cheerio.Root): Promise<BothScores> {
             .text()
             .trim();
 
-    const userscore = nonNaN(parseFloat(userscoreStr), undefined);
-
     return {
-        metascore,
-        userscore,
+        metascore: nonNaN(parseFloat(metascoreStr), undefined),
+        userscore: nonNaN(parseFloat(userscoreStr), undefined),
     };
 }
 
