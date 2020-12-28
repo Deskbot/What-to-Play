@@ -62,7 +62,7 @@ export async function getData(game: string): Promise<HowLongToBeatResult | undef
 
     // get completion times
 
-    const timeElems = searchResult
+    const gridElems = searchResult
         .find(".search_list_tidbit,.search_list_tidbit_short,.search_list_tidbit_long")
         .toArray();
 
@@ -71,8 +71,8 @@ export async function getData(game: string): Promise<HowLongToBeatResult | undef
     let i = 0;
     while (true) {
         // the elements alternate between labels and fields
-        const fieldElem = timeElems[i];
-        const timeElem = timeElems[i + 1];
+        const fieldElem = gridElems[i];
+        const timeElem = gridElems[i + 1];
         i += 2;
 
         if (fieldElem === undefined) break;
@@ -99,6 +99,6 @@ function getTimeFromElem(elem: cheerio.Cheerio): number | undefined {
     const timeStr = elem.html()?.replace("½", ".5");
     const time = parseFloat(timeStr as any); // undefined returns NaN
 
-    if (Number.isNaN(time)) return undefined; // likely lack of data
+    if (Number.isNaN(time)) return undefined; // likely lack of data i.e. when timeStr === "--"
     return time;
 }
