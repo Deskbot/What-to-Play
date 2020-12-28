@@ -93,15 +93,13 @@ export async function getInfo(game: string, platforms: MetacriticPlatform[]): Pr
     // todo check if the initial page is for a platform we want
 
     for (const { metascore, userscore } of scores) {
-        if (metascoreMax === undefined
-            || (metascore !== undefined && metascore > metascoreMax)
-        ) {
+        // undefined compared (> or <) with undefined or with a number
+        // always results in false
+
+        if ((metascore as number) > (metascoreMax as number)) {
             metascoreMax = metascore;
         }
-
-        if (userscoreMax === undefined
-            || (userscore !== undefined && userscore > userscoreMax)
-        ) {
+        if ((userscore as number) > (userscoreMax as number)) {
             userscoreMax = userscore;
         }
     }
