@@ -5,11 +5,29 @@ import { bug } from "./util";
 
 export interface HowLongToBeatResult {
     name: string;
-    mainStory: number | undefined;
-    mainPlusExtra: number | undefined;
-    completionist: number | undefined;
+    times: {
+        mainStory?: number;
+        mainPlusExtra?: number;
+        completionist?: number;
+        solo?: number;
+        coop?: number;
+        vs?: number;
+    };
     url: string;
 }
+
+/**
+ * A map from the name of each measure of completion time used by howlongtobeat.com
+ * to the key used in the result of this program.
+ */
+const fieldMap: Record<string, keyof HowLongToBeatResult["times"] | undefined> = {
+    "Main Story": "mainStory",
+    "Main + Extra": "mainPlusExtra",
+    "Completionist": "completionist",
+    "Solo": "solo",
+    "Co-Op": "coop",
+    "Vs.": "vs",
+} as const;
 
 export async function getData(game: string): Promise<HowLongToBeatResult | undefined> {
     // search for game on the website
@@ -35,32 +53,44 @@ export async function getData(game: string): Promise<HowLongToBeatResult | undef
     if (searchResult.length === 0) return undefined;
 
     // get name
-
     const nameElem = searchResult.find("a").first();
     const name = nameElem.text();
     if (!name) bug();
 
-    // get completion times
-
-    const timeElems = searchResult
-        .find(".search_list_tidbit")
-        .toArray();
-
-    if (timeElems.length !== 6) bug();
-
-    // every even numbered element is just the text next to the number
-    const mainStory = getTimeFromElem(searchPage(timeElems[1]));
-    const mainPlusExtra = getTimeFromElem(searchPage(timeElems[3]));
-    const completionist = getTimeFromElem(searchPage(timeElems[5]));
-
     // get url
     const url = "https://howlongtobeat.com/" + nameElem.attr("href");
 
+    // get completion times
+
+    const timeElems = searchResult
+        .find(".search_list_tidbit,.search_list_tidbit_short,.search_list_tidbit_long")
+        .toArray();
+
+    const times = {} as HowLongToBeatResult["times"];
+
+    let i = 0;
+    while (true) {
+        // the elements alternate between labels and fields
+        const fieldElem = timeElems[i];
+        const timeElem = timeElems[i + 1];
+        i += 2;
+
+        if (fieldElem === undefined) break;
+
+        const fieldName = searchPage(fieldElem).text().trim();
+        const time = getTimeFromElem(searchPage(timeElem));
+
+        // transform the given field name into the key we want to use in the result
+        const key = fieldMap[fieldName];
+        if (key === undefined) bug();
+
+        // add the time to the output
+        times[key] = time;
+    }
+
     return {
         name,
-        mainStory,
-        mainPlusExtra,
-        completionist,
+        times,
         url,
     };
 }

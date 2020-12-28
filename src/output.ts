@@ -32,7 +32,10 @@ export type CsvHeaders =
     | "How Long to Beat URL"
     | "How Long to Beat: Main Story"
     | "How Long to Beat: Main Story + Extra"
-    | "How Long to Beat: Completionist";
+    | "How Long to Beat: Completionist"
+    | "How Long to Beat: Solo"
+    | "How Long to Beat: Co-Op"
+    | "How Long to Beat: Vs.";
 
 export type ResultCSV = Record<CsvHeaders, string>;
 
@@ -56,6 +59,9 @@ export const csvHeaders: ReadonlyArray<CsvHeaders> = [
     "How Long to Beat: Main Story",
     "How Long to Beat: Main Story + Extra",
     "How Long to Beat: Completionist",
+    "How Long to Beat: Solo",
+    "How Long to Beat: Co-Op",
+    "How Long to Beat: Vs.",
 ];
 
 export async function getData(game: string, platforms: MetacriticPlatform[]): Promise<ResultJson> {
@@ -94,9 +100,12 @@ export async function getCsv(game: string, platforms: MetacriticPlatform[]): Pro
         "GOG Score": data.gog?.score,
         "How Long to Beat Name": data.hltb?.name,
         "How Long to Beat URL": data.hltb?.url,
-        "How Long to Beat: Main Story": data.hltb?.mainStory,
-        "How Long to Beat: Main Story + Extra": data.hltb?.mainPlusExtra,
-        "How Long to Beat: Completionist": data.hltb?.completionist,
+        "How Long to Beat: Main Story": data.hltb?.times.mainStory,
+        "How Long to Beat: Main Story + Extra": data.hltb?.times.mainPlusExtra,
+        "How Long to Beat: Completionist": data.hltb?.times.completionist,
+        "How Long to Beat: Solo": data.hltb?.times.solo,
+        "How Long to Beat: Co-Op": data.hltb?.times.coop,
+        "How Long to Beat: Vs.": data.hltb?.times.vs,
     };
 
     // iterate through in the same order every time guaranteed
