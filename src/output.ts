@@ -1,4 +1,5 @@
 import * as gog from "./gog";
+import * as hltb from "./how-long-to-beat";
 import * as metacritic from "./metacritic";
 import * as steam from "./steam";
 import { MetacriticPlatform } from "./metacritic";
@@ -6,6 +7,7 @@ import { csvFriendly, printable } from "./util";
 
 export interface ResultJson {
     game: string;
+    hltb: hltb.HowLongToBeatResult | undefined;
     gog: gog.GogResult | undefined;
     metacritic: metacritic.MetacriticResult | undefined;
     steam: steam.SteamResult | undefined;
@@ -25,7 +27,12 @@ export type CsvHeaders =
     | "Metacritic User Score URL"
     | "GOG Name"
     | "GOG URL"
-    | "GOG Score";
+    | "GOG Score"
+    | "How Long to Beat Name"
+    | "How Long to Beat URL"
+    | "How Long to Beat: Main Story"
+    | "How Long to Beat: Main Story + Extra"
+    | "How Long to Beat: Completionist";
 
 export type ResultCSV = Record<CsvHeaders, string>;
 
@@ -44,6 +51,11 @@ export const csvHeaders: ReadonlyArray<CsvHeaders> = [
     "GOG Name",
     "GOG URL",
     "GOG Score",
+    "How Long to Beat Name",
+    "How Long to Beat URL",
+    "How Long to Beat: Main Story",
+    "How Long to Beat: Main Story + Extra",
+    "How Long to Beat: Completionist",
 ];
 
 export async function getData(game: string, platforms: MetacriticPlatform[]): Promise<ResultJson> {
@@ -52,6 +64,7 @@ export async function getData(game: string, platforms: MetacriticPlatform[]): Pr
         gog: await gog.getData(game),
         metacritic: await metacritic.getInfo(game, platforms),
         steam: await steam.getInfo(game),
+        hltb: await hltb.getData(game),
     };
 }
 
@@ -80,6 +93,11 @@ export async function getCsv(game: string, platforms: MetacriticPlatform[]): Pro
         "GOG Name": data.gog?.name,
         "GOG URL": data.gog?.url,
         "GOG Score": data.gog?.score,
+        "How Long to Beat Name": data.hltb?.name,
+        "How Long to Beat URL": data.hltb?.url,
+        "How Long to Beat: Main Story": data.hltb?.mainStory,
+        "How Long to Beat: Main Story + Extra": data.hltb?.mainPlusExtra,
+        "How Long to Beat: Completionist": data.hltb?.completionist,
     };
 
     // iterate through in the same order every time guaranteed
