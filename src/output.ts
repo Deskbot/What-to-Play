@@ -143,6 +143,7 @@ function aggregateScore(
     const steam_allTimeScore = steamResult?.allTimeScore;
     const steam_recentScore = steamResult?.recentScore;
 
+    // make all scores out of 100
     if (gog_score !== undefined) {
         scores.push(gog_score * 20);
     }
