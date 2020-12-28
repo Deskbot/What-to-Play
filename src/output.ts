@@ -76,7 +76,6 @@ export async function getCsv(game: string, platforms: MetacriticPlatform[]): Pro
     const buffer = [] as string[];
 
     const data = await getData(game, platforms);
-    if (data === undefined) return "";
 
     const newData = {
         "Game": data.game,
