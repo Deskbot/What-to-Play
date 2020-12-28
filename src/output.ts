@@ -159,7 +159,7 @@ function aggregateScore(
         scores.push(steam_recentScore);
     }
 
-    if (scores.length === undefined) {
+    if (scores.length === 0) {
         return undefined;
     }
 
