@@ -107,10 +107,10 @@ export async function getInfo(game: string, platforms: MetacriticPlatform[]): Pr
         // undefined compared (> or <) with undefined or with a number
         // always results in false
 
-        if ((metascore as number) > (metascoreMax as number)) {
+        if ((metascore as number) > (metascoreMax as number) || metascoreMax === undefined) {
             metascoreMax = metascore;
         }
-        if ((userscore as number) > (userscoreMax as number)) {
+        if ((userscore as number) > (userscoreMax as number) || userscoreMax === undefined) {
             userscoreMax = userscore;
         }
     }
@@ -129,7 +129,7 @@ function getOtherPlatformUrls(page: cheerio.Root, platforms: MetacriticPlatform[
     page(".product_platforms")
         .first()
         .find("a")
-        .each((i, elem) => {
+        .each((_, elem) => {
             const tagElem = elem as cheerio.TagElement;
             const href = tagElem.attribs && tagElem.attribs["href"];
             if (!href) bug();
