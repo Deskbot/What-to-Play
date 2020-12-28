@@ -5,9 +5,9 @@ import { bug } from "./util";
 
 export interface HowLongToBeatResult {
     name: string;
-    mainStory: number;
-    mainPlusExtra: number;
-    completionist: number;
+    mainStory: number | undefined;
+    mainPlusExtra: number | undefined;
+    completionist: number | undefined;
     url: string;
 }
 
@@ -43,16 +43,15 @@ export async function getData(game: string): Promise<HowLongToBeatResult | undef
     // get completion times
 
     const timeElems = searchResult
-        .find(".search_list_details_block")
-        .first()
-        .find(".time_100")
+        .find(".search_list_details_block .search_list_tidbit")
         .toArray();
 
-    if (timeElems.length !== 3) bug();
+    if (timeElems.length !== 6) bug();
 
-    const mainStory = getTimeFromElem(searchPage(timeElems[0]));
-    const mainPlusExtra = getTimeFromElem(searchPage(timeElems[1]));
-    const completionist = getTimeFromElem(searchPage(timeElems[2]));
+    // every even numbered element is just the text next to the number
+    const mainStory = getTimeFromElem(searchPage(timeElems[1]));
+    const mainPlusExtra = getTimeFromElem(searchPage(timeElems[3]));
+    const completionist = getTimeFromElem(searchPage(timeElems[5]));
 
     // get url
     const url = "https://howlongtobeat.com/" + nameElem.attr("href");
@@ -66,9 +65,10 @@ export async function getData(game: string): Promise<HowLongToBeatResult | undef
     };
 }
 
-function getTimeFromElem(elem: cheerio.Cheerio): number {
+function getTimeFromElem(elem: cheerio.Cheerio): number | undefined {
     const timeStr = elem.html()?.replace("½", ".5");
     const time = parseFloat(timeStr as any); // undefined returns NaN
-    if (Number.isNaN(time)) bug();
+
+    if (Number.isNaN(time)) return undefined; // likely lack of data
     return time;
 }

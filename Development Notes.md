@@ -116,3 +116,11 @@ dreamcast
 The score that GOG shows in the search menu is sometimes missing (0) when there is a score on the product page.
 
 In the case of Cyberpunk 2077, the search menu shows 5 stars but the product page shows <4 stars.
+
+---
+
+How long to beat doesn't have very helpful classes where it displays the timings in the search results.
+
+It uses "--" instead of some text when there is not enough data or the game isn't out.
+
+---
