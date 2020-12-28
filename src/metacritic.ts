@@ -63,7 +63,7 @@ export const platforms: ReadonlyMap<RegExp, MetacriticPlatform> = new Map([
 ]);
 
 function absoluteUrl(relativeUrl: string): string {
-    return "https://www.metacritic.com/" + relativeUrl;
+    return "https://www.metacritic.com" + relativeUrl;
 }
 
 export async function getInfo(game: string, platforms: MetacriticPlatform[]): Promise<MetacriticResult | undefined> {
