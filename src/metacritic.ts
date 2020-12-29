@@ -1,7 +1,7 @@
 import * as cheerio from "cheerio";
 import fetch from "node-fetch";
 import * as querystring from "querystring";
-import { awaitPair, bug, nonNaN } from "./util";
+import { bug, nonNaN } from "./util";
 
 export interface MetacriticResult {
     name: string;
@@ -73,6 +73,10 @@ export const platforms: ReadonlyMap<RegExp, MetacriticPlatform> = new Map([
 
 function absoluteUrl(relativeUrl: string): string {
     return "https://www.metacritic.com" + relativeUrl;
+}
+
+async function awaitPair<A, B>([a, promiseB]: [A, Promise<B>]): Promise<[A, B]> {
+    return [a, await promiseB];
 }
 
 export async function getInfo(game: string, platforms: MetacriticPlatform[]): Promise<MetacriticResult | undefined> {

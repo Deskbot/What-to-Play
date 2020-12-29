@@ -11,10 +11,6 @@ export function average(arr: number[]): number {
     return total / len;
 }
 
-export async function awaitPair<A,B>([a, promiseB]: [A, Promise<B>]): Promise<[A, B]> {
-    return [a, await promiseB];
-}
-
 export function bindUndefined<T, U>(val: T | undefined, func: (val: T) => U): U | undefined {
     if (val === undefined) return undefined;
     return func(val);
