@@ -116,3 +116,9 @@ How Long to Beat times |  ∞      | hours | Time
 The JSON output has fields for hyperlinks to where the data came from. In the CSV output, these urls are encoded as hyperlinks in the cell containing the related data.
 
 The hyperlinks are encoded as `=HYPERLINK("url","label")`, which is a valid formula with the same behaviour across Libre Office Calc, Google Sheets, and Microsoft Office Excel, and probably several others.
+
+## Privacy
+
+Be aware that by running the software, you may be subject to aspects of the privacy policies of the websites visited.
+
+This program does not send any cookies to those sites and scripts on the queried web pages are never executed. So it is not the same as if you were to visit these sites manually.
