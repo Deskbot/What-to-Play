@@ -40,7 +40,15 @@ function main() {
     const resultToString = csv
         ? getCsv
         : getJson;
-    const print: Printer = game => resultToString(game, platforms).then(console.log);
+
+    const print: Printer = (game) => {
+        game = game.trim();
+
+        if (game.length > 0) {
+            resultToString(game, platforms)
+                .then(console.log);
+        }
+    }
 
     const file = args._[0] as string | undefined; // first arg
 
@@ -58,8 +66,12 @@ function main() {
 function parsePlatforms(str: string): MetacriticPlatform[] {
     const result = [] as MetacriticPlatform[];
 
-    for (const input of str.split(",")) {
-        const maybePlatform = metacritic.toPlatform(input.trim());
+    for (let input of str.split(",")) {
+        input = input.trim();
+
+        if (input.length === 0) continue;
+
+        const maybePlatform = metacritic.toPlatform(input);
         if (maybePlatform) {
             result.push(maybePlatform);
         }

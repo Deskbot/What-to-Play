@@ -8,8 +8,8 @@ import { average, bindUndefined, csvFriendly, escapeDoubleQuotes, printable } fr
 export interface AllData {
     game: string;
     aggregateScore?: number;
-    hltb?: hltb.HowLongToBeatResult;
     gog?: gog.GogResult;
+    hltb?: hltb.HowLongToBeatResult;
     metacritic?: metacritic.MetacriticResult;
     steam?: steam.SteamResult;
 }
