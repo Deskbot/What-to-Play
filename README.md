@@ -96,6 +96,10 @@ The scores are reported the same as on the website the score came from, they are
 
 The CSV columns and JSON fields are pretty self-explanatory and may change over time, so they are not specified here.
 
+The output includes the title of the game as interpreted by each website. You should check this to be sure that the information you're seeing is actually for the given game.
+
+For various reasons, a game or score might not be found from the website. As a CSV, this leaves an empty field. In JSON, the field is not present.
+
 ### Understanding the Numbers
 
 Number                 | Maximum | Unit  | Measure of
@@ -104,6 +108,7 @@ GOG rating             |   5     |       | Mean user-submitted rating
 Metacritic Metascore   | 100     |       | Game Critic review scores put through some formula
 Metacritic user score  |  10     |       | Presumably the mean user-submitted rating
 Steam rating           | 100     | %     | Percent of users who gave a positive review
+Aggregate Score        | 100     |       | Average of all other score fields, normalised to be out of 100. Each present score is weighted equally.
 How Long to Beat times |  ∞      | hours | Time
 
 ### Format Differences
