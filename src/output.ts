@@ -33,9 +33,9 @@ export const csvHeaders = [
     "How Long to Beat: Co-Op",
     "How Long to Beat: Vs.",
 ] as const;
+export const csvHeaderRow = csvHeaders.join(",");
 
 export type CsvHeaders = typeof csvHeaders[number];
-export type ResultCSV = Record<CsvHeaders, string>;
 
 /**
  * Based on common spreadsheet syntax.
@@ -81,7 +81,7 @@ export async function getCsv(game: string, platforms: MetacriticPlatform[]): Pro
 
     const data = await getData(game, platforms);
 
-    const newData = {
+    const newData: Record<CsvHeaders, string | number | undefined> = {
         "Game": data.game,
         "Aggregate Score": data.aggregateScore,
         "Steam Name": bindUndefined(data.steam, s => toHyperlink(s.url, s.name)),

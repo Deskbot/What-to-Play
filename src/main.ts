@@ -5,7 +5,7 @@ import * as minimist from "minimist";
 import * as process from "process";
 import * as readline from "readline";
 import { MetacriticPlatform } from "./metacritic";
-import { csvHeaders, getCsv, getJson } from "./output";
+import { csvHeaderRow, getCsv, getJson } from "./output";
 
 interface Printer {
     (game: string): void;
@@ -29,7 +29,7 @@ function main() {
     const csv = !args["json"];
 
     if (csv) {
-        console.log(csvHeaders.join(","));
+        console.log(csvHeaderRow);
     }
 
     const givenPlatforms: string | undefined = args["-p"] || args["--platform"];
