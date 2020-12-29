@@ -108,7 +108,7 @@ GOG rating             |   5     |       | Mean user-submitted rating
 Metacritic Metascore   | 100     |       | Game Critic review scores put through some formula
 Metacritic user score  |  10     |       | Presumably the mean user-submitted rating
 Steam rating           | 100     | %     | Percent of users who gave a positive review
-Aggregate Score        | 100     |       | Average of all other score fields, normalised to be out of 100. Each present score is weighted equally.
+Aggregate score        | 100     |       | Mean of all other score fields, each normalised to be out of 100. Each score is weighted equally. If the score isn't present, it doesn't contribute to the average.
 How Long to Beat times |  ∞      | hours | Time
 
 ### Format Differences
