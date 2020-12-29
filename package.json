@@ -13,6 +13,7 @@
     "/build/**/*.js",
     "/build/**/*.js.map",
     "/build/**/*.d.ts",
+    "/LICENSE",
     "/README.md"
   ],
   "bin": {
@@ -27,7 +28,7 @@
     "review"
   ],
   "author": "Thomas Richards",
-  "license": "MIT",
+  "license": "./LICENSE",
   "bugs": {
     "url": "https://github.com/Deskbot/What-to-Play/issues"
   },

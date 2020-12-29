@@ -119,6 +119,10 @@ The hyperlinks are encoded as `=HYPERLINK("url","label")`, which is a valid form
 
 ## Privacy
 
-Be aware that by running the software, you may be subject to aspects of the privacy policies of the websites visited.
+Be aware that by running the software, you may be subject to aspects of the privacy policies of the websites visited. The websites that could be visited are listed above.
 
 This program does not send any cookies to those sites and scripts on the queried web pages are never executed. So it is not the same as if you were to visit these sites manually.
+
+## License
+
+The license is a slightly modified version of the MIT license to require that you to provide a notice about privacy like the one above.
