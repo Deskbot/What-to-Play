@@ -52,9 +52,15 @@ function toHyperlink(url: string, text: string | number): string {
 }
 
 export async function getData(game: string, platforms: MetacriticPlatform[]): Promise<AllData> {
-    const gogData = await gog.getData(game);
-    const metacriticData = await metacritic.getInfo(game, platforms);
-    const steamData = await steam.getInfo(game);
+    const gogDataProm = gog.getData(game);
+    const metacriticDataProm = metacritic.getInfo(game, platforms);
+    const steamDataProm = steam.getInfo(game);
+    const hltbDataProm = hltb.getData(game);
+
+    // spawn all promises before blocking on their results
+    const gogData = await gogDataProm;
+    const metacriticData = await metacriticDataProm;
+    const steamData = await steamDataProm;
 
     return {
         game,
@@ -62,7 +68,7 @@ export async function getData(game: string, platforms: MetacriticPlatform[]): Pr
         gog: gogData,
         metacritic: metacriticData,
         steam: steamData,
-        hltb: await hltb.getData(game),
+        hltb: await hltbDataProm,
     };
 }
 
