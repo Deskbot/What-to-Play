@@ -110,12 +110,9 @@ export async function getCsv(game: string, platforms: MetacriticPlatform[]): Pro
 
     for (const key of keys) {
         buffer.push(csvFriendly(printable(newData[key])));
-        buffer.push(",");
     }
 
-    buffer.push("\n");
-
-    return buffer.join("");
+    return buffer.join(",");
 }
 
 function aggregateScore(
