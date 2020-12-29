@@ -71,7 +71,9 @@ function parsePlatforms(str: string): MetacriticPlatform[] {
 function printHelp() {
     console.log("Usage: command (file name)? (argument)*");
     console.log("");
-    console.log("arguments:")
+    console.log("Format of file/stdin: new-line-separated list of game names");
+    console.log("");
+    console.log("Arguments:")
     console.log("-h | --help      : Print help.");
     console.log("-p | --platforms : A comma separated list of platforms. When the score differs by platform, the best score is chosen (defaults to all platforms).");
     console.log("--json           : Output in JSON format (defaults to CSV).");
