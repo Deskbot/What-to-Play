@@ -106,9 +106,7 @@ export async function getCsv(game: string, platforms: MetacriticPlatform[]): Pro
     };
 
     // iterate through in the same order every time guaranteed
-    const keys = Object.keys(newData) as CsvHeaders[];
-
-    for (const key of keys) {
+    for (const key of csvHeaders) {
         buffer.push(csvFriendly(printable(newData[key])));
     }
 
