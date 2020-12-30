@@ -38,15 +38,15 @@ export function escapeDoubleQuotes(s: string, replacement: string): string {
     return s.replace(allDoubleQuotes, replacement);
 }
 
-export function printable(val: string | number | undefined): string {
-    if (val === undefined) return "";
-    return val.toString();
-}
-
 export function nonNaN<T>(num: number, fallback: T): number | T {
     if (Number.isNaN(num)) {
         return fallback;
     } else {
         return num;
     }
+}
+
+export function printable(val: string | number | undefined): string {
+    if (val === undefined) return "";
+    return val.toString();
 }
