@@ -38,6 +38,13 @@ export function escapeDoubleQuotes(s: string, replacement: string): string {
     return s.replace(allDoubleQuotes, replacement);
 }
 
+export function logAndDefault<E,T>(val: T): (err: E) => T {
+    return err => {
+        console.error(err);
+        return val;
+    };
+}
+
 export function nonNaN<T>(num: number, fallback: T): number | T {
     if (Number.isNaN(num)) {
         return fallback;

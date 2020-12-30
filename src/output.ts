@@ -3,7 +3,7 @@ import * as hltb from "./how-long-to-beat";
 import * as metacritic from "./metacritic";
 import * as steam from "./steam";
 import { MetacriticPlatform } from "./metacritic";
-import { average, bindUndefined, csvFriendly, escapeDoubleQuotes, printable } from "./util";
+import { average, bindUndefined, csvFriendly, escapeDoubleQuotes, logAndDefault, printable } from "./util";
 
 export interface AllData {
     game: string;
@@ -58,9 +58,9 @@ export async function getData(game: string, platforms: MetacriticPlatform[]): Pr
     const hltbDataProm = hltb.getData(game);
 
     // spawn all promises before blocking on their results
-    const gogData = await gogDataProm;
-    const metacriticData = await metacriticDataProm;
-    const steamData = await steamDataProm;
+    const gogData = await gogDataProm.catch(logAndDefault(undefined));
+    const metacriticData = await metacriticDataProm.catch(logAndDefault(undefined));
+    const steamData = await steamDataProm.catch(logAndDefault(undefined));
 
     return {
         game,
@@ -68,7 +68,7 @@ export async function getData(game: string, platforms: MetacriticPlatform[]): Pr
         gog: gogData,
         metacritic: metacriticData,
         steam: steamData,
-        hltb: await hltbDataProm,
+        hltb: await hltbDataProm.catch(logAndDefault(undefined)),
     };
 }
 
