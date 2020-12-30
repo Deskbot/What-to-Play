@@ -6,7 +6,8 @@
   "types": "build",
   "scripts": {
     "build": "tsc -i",
-    "main": "npm run build && node -r source-map-support/register build/main.js"
+    "main": "npm run build && node -r source-map-support/register build/main.js",
+    "test": "testyts"
   },
   "files": [
     "/bin",
@@ -44,6 +45,7 @@
     "@types/node": "^14.14.16",
     "@types/node-fetch": "^2.5.7",
     "source-map-support": "^0.5.19",
+    "testyts": "^1.1.0",
     "typescript": "^4.1.3"
   }
 }
