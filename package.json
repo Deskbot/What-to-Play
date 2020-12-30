@@ -15,6 +15,9 @@
     "/build/**/*.js",
     "/build/**/*.js.map",
     "/build/**/*.d.ts",
+    "!/build/**/*.test.js",
+    "!/build/**/*.test.js.map",
+    "!/build/**/*.test.d.ts",
     "/LICENSE",
     "/README.md"
   ],
