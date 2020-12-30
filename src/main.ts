@@ -25,6 +25,10 @@ function main() {
         return printHelp();
     }
 
+    if (args["readme"]) {
+        return printReadme();
+    }
+
     // default to CSV
     const csv = !args["json"];
 
@@ -87,6 +91,12 @@ function printHelp() {
     console.log("");
     console.log("Arguments:")
     console.log("-h | --help      : Print help.");
+    console.log("--readme         : Print the readme.");
     console.log("-p | --platforms : A comma separated list of platforms. When the score differs by platform, the best score is chosen (defaults to all platforms).");
     console.log("--json           : Output in JSON format (defaults to CSV).");
+}
+
+function printReadme() {
+    fs.createReadStream(__dirname + "/../README.md")
+        .pipe(process.stdout);
 }

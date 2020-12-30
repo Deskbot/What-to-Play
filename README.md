@@ -52,6 +52,7 @@ Format of file/stdin: new-line-separated list of game names
 
 Arguments:
 -h | --help      : Print help.
+--readme         : Print the readme.
 -p | --platforms : A comma separated list of platforms. When the score differs by platform, the best score is chosen (defaults to all platforms).
 --json           : Output in JSON format (defaults to CSV).
 ```
