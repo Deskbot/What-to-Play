@@ -124,3 +124,11 @@ How long to beat doesn't have very helpful classes where it displays the timings
 It uses "--" instead of some text when there is not enough data or the game isn't out.
 
 ---
+
+String similarity:
+
+I think Damerau–Levenshtein distance is overkill because all websites except opencritic show nothing if you have letters flipped
+
+Levenshtein distance will probably do. All the other string algorithms I've looked at account for things I don't think we need to consider
+
+The main trouble with matching is when your game's name is a substring of another e.g. Hollow vs Hollow Knight, Dark Souls vs Dark Souls 2. Levenshtein distance will prefer the shorter names.
