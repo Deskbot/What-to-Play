@@ -6,10 +6,7 @@ import * as process from "process";
 import * as readline from "readline";
 import { MetacriticPlatform } from "./metacritic";
 import { csvHeaderRow, getCsv, getJson } from "./output";
-
-interface Printer {
-    (game: string): void;
-}
+import { delayed, Sequence } from "./util";
 
 try {
     main();
@@ -45,12 +42,15 @@ function main() {
         ? getCsv
         : getJson;
 
-    const print: Printer = (game) => {
+    const sync = new Sequence();
+    const print = (game: string) => {
         game = game.trim();
 
         if (game.length > 0) {
-            resultToString(game, platforms)
-                .then(console.log);
+            sync.andThen(async () => {
+                const str = await resultToString(game, platforms);
+                console.log(str);
+            });
         }
     }
 

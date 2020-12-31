@@ -57,3 +57,36 @@ export function printable(val: string | number | undefined): string {
     if (val === undefined) return "";
     return val.toString();
 }
+
+/**
+ * Takes asynchronous functions and spawns them
+ * only when the last function to be given has been spawned and resolved.
+ * If a promise rejects, no further functions are called.
+ */
+export class Sequence {
+    private currentCommand: Promise<void> | undefined;
+    private commands = [] as Array<() => Promise<void>>;
+
+    andThen(asyncCommand: () => Promise<void>) {
+        if (this.currentCommand === undefined) {
+            this.schedule(asyncCommand);
+        } else {
+            this.commands.push(asyncCommand);
+        }
+    }
+
+    private schedule(asyncCommand: () => Promise<void>) {
+        this.currentCommand = asyncCommand();
+
+        // when the current command is done, start the next one
+        this.currentCommand.then(() => {
+            const nextCommand = this.commands.shift();
+
+            if (nextCommand === undefined) {
+                this.currentCommand = undefined;
+            } else {
+                this.schedule(nextCommand);
+            }
+        });
+    }
+}
