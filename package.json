@@ -40,6 +40,7 @@
   "homepage": "https://github.com/Deskbot/What-to-Play#readme",
   "dependencies": {
     "cheerio": "^1.0.0-rc.5",
+    "fastest-levenshtein": "^1.0.12",
     "minimist": "^1.2.5",
     "node-fetch": "^2.6.1"
   },
