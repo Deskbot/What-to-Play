@@ -17,12 +17,14 @@ interface SteamSearchResult {
 }
 
 export async function getData(game: string): Promise<SteamResult | undefined> {
-    const productData = await getProduct(game);
+    const productData = await searchGame(game);
     if (productData === undefined) return undefined;
 
     const { name, url } = productData;
 
-    const storePage = cheerio.load(await getPage(url));
+    // get scores from product page
+
+    const storePage = cheerio.load(await getStorePage(url));
     const reviewInfos = storePage(".user_reviews_summary_row");
 
     let recentScore: number | undefined;
@@ -53,18 +55,19 @@ export async function getData(game: string): Promise<SteamResult | undefined> {
     };
 }
 
-function getPage(url: string): Promise<string> {
-    return fetch(url, {
+async function getStorePage(url: string): Promise<string> {
+    const res = await fetch(url, {
         headers: {
             "Cookie": "birthtime=281318401" // bypass age restriction
         }
-    }).then(res => res.text());
+    });
+    return await res.text();
 }
 
-async function getProduct(game: string): Promise<SteamSearchResult | undefined> {
+async function searchGame(game: string): Promise<SteamSearchResult | undefined> {
     const gameStr = querystring.escape(game);
     const searchUrl = `https://store.steampowered.com/search/?term=${gameStr}`;
-    const searchPage = cheerio.load(await getPage(searchUrl));
+    const searchPage = cheerio.load(await getStorePage(searchUrl));
 
     const searchResultRow = searchPage(".search_result_row").first();
     const name = searchResultRow.find(".title").first().text();

@@ -87,12 +87,12 @@ async function awaitPair<A, B>([a, promiseB]: [A, Promise<B>]): Promise<[A, B]> 
 }
 
 export async function getData(game: string, platforms: MetacriticPlatform[]): Promise<MetacriticResult | undefined> {
-    const productData = await getProduct(game);
+    const productData = await searchGame(game);
     if (productData === undefined) return undefined;
 
     const { name, platform, reviewUrl } = productData;
 
-    // determine scores
+    // get scores from product pages
 
     const reviewPageText = await fetch(reviewUrl).then(res => res.text());
     const reviewPage = cheerio.load(reviewPageText);
@@ -141,7 +141,7 @@ export async function getData(game: string, platforms: MetacriticPlatform[]): Pr
     };
 }
 
-async function getProduct(game: string): Promise<MetacriticSearchResult | undefined> {
+async function searchGame(game: string): Promise<MetacriticSearchResult | undefined> {
     const searchUrl = "https://www.metacritic.com/autosearch";
     const gameStr = querystring.escape(game);
 
