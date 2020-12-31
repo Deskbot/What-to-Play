@@ -12,16 +12,6 @@ export class UtilSuite {
     }
 
     @Test()
-    async delayed() {
-        const startTime = new Date().getTime();
-        const timeTaken = await util.delayed(() => {
-            return new Date().getTime() - startTime;
-        }, 10)();
-
-        ok(timeTaken > 8 && timeTaken < 12);
-    }
-
-    @Test()
     escapeDoubleQuotes() {
         strictEqual(util.escapeDoubleQuotes('',    '""'), '');
         strictEqual(util.escapeDoubleQuotes('str', '""'), 'str');

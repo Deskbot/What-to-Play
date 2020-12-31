@@ -3,23 +3,6 @@ import fetch from "node-fetch";
 import * as querystring from "querystring";
 import { bug, nonNaN } from "./util";
 
-export interface MetacriticResult {
-    name: string;
-    url: string;
-
-    /**
-     * can assume that if metascore is present, the corresponding url will be present
-     */
-    metascore?: number;
-    /**
-     * can assume that if userscore is present, the corresponding url will be present
-     */
-    userscore?: number;
-
-    metascoreUrl?: string;
-    userscoreUrl?: string;
-}
-
 type BothScores = Pick<MetacriticResult, "metascore" | "userscore">;
 
 export type MetacriticPlatform =
@@ -45,6 +28,29 @@ export type MetacriticPlatform =
     | "game-boy-advance"
     | "ios"
     | "dreamcast";
+
+export interface MetacriticResult {
+    name: string;
+    url: string;
+
+    /**
+     * can assume that if metascore is present, the corresponding url will be present
+     */
+    metascore?: number;
+    /**
+     * can assume that if userscore is present, the corresponding url will be present
+     */
+    userscore?: number;
+
+    metascoreUrl?: string;
+    userscoreUrl?: string;
+}
+
+interface MetacriticSearchResult {
+    name: string;
+    platform: MetacriticPlatform;
+    reviewUrl: string;
+}
 
 export const platforms: ReadonlyMap<RegExp, MetacriticPlatform> = new Map([
     [/^(ps|playstation).*5$/i, "playstation-5"],
@@ -80,26 +86,13 @@ async function awaitPair<A, B>([a, promiseB]: [A, Promise<B>]): Promise<[A, B]> 
 }
 
 export async function getInfo(game: string, platforms: MetacriticPlatform[]): Promise<MetacriticResult | undefined> {
-    const gameStr = querystring.escape(game);
-    const searchUrl = `https://www.metacritic.com/search/game/${gameStr}/results`;
+    const productData = await getProduct(game);
 
-    const searchPageText = await fetch(searchUrl).then(res => res.text());
-    const searchPage = cheerio.load(searchPageText);
+    if (productData === undefined) return undefined;
 
-    // choose one of the products found on the search page:
-
-    const product = searchPage(".main_stats").first();
-    const anchor = product.parent().find("a");
-    if (anchor.length === 0) return undefined;
-
-    const name = anchor.text().trim();
-    const href = anchor.attr("href");
-    if (!href) bug();
+    const { name, platform, reviewUrl } = productData;
 
     // determine scores
-
-    const reviewUrl = absoluteUrl(href);
-    if (!reviewUrl) bug();
 
     const reviewPageText = await fetch(reviewUrl).then(res => res.text());
     const reviewPage = cheerio.load(reviewPageText);
@@ -111,8 +104,7 @@ export async function getInfo(game: string, platforms: MetacriticPlatform[]): Pr
         .map(url => awaitPair([url, getScoresByUrl(url)]));
 
     // add the starting page score if it is for a platform we want
-    const startingPlatform = platformFromUrl(href);
-    if (platforms.includes(startingPlatform)) {
+    if (platforms.includes(platform)) {
         scorePromises.push(awaitPair([reviewUrl, getScores(reviewPage)]));
     }
 
@@ -146,6 +138,35 @@ export async function getInfo(game: string, platforms: MetacriticPlatform[]): Pr
         userscore: userscoreMax,
         metascoreUrl: bestMetascoreUrl,
         userscoreUrl: bestUserscoreUrl,
+    };
+}
+
+async function getProduct(game: string): Promise<MetacriticSearchResult | undefined> {
+    const gameStr = querystring.escape(game);
+    const searchUrl = `https://www.metacritic.com/search/game/${gameStr}/results`;
+
+    const searchPageText = await fetch(searchUrl).then(res => res.text());
+    const searchPage = cheerio.load(searchPageText);
+
+    // choose one of the products found on the search page:
+
+    const product = searchPage(".main_stats").first();
+    const anchor = product.parent().find("a");
+    if (anchor.length === 0) return undefined;
+
+    const name = anchor.text().trim();
+    const href = anchor.attr("href");
+    if (!href) bug();
+
+    const reviewUrl = absoluteUrl(href);
+    if (!reviewUrl) bug();
+
+    const platform = platformFromUrl(href);
+
+    return {
+        name,
+        platform,
+        reviewUrl,
     };
 }
 

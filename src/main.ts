@@ -6,7 +6,7 @@ import * as process from "process";
 import * as readline from "readline";
 import { MetacriticPlatform } from "./metacritic";
 import { csvHeaderRow, getCsv, getJson } from "./output";
-import { delayed, Sequence } from "./util";
+import { Sequence } from "./util";
 
 try {
     main();
