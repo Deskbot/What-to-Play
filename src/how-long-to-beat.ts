@@ -40,7 +40,7 @@ export async function getData(game: string): Promise<HowLongToBeatResult | undef
         method: "POST",
         body: postData,
         headers: {
-            "content-type": "application/x-www-form-urlencoded"
+            "Content-Type": "application/x-www-form-urlencoded"
         }
     })
     .then(res => res.text());

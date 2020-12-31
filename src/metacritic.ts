@@ -1,6 +1,7 @@
 import * as cheerio from "cheerio";
 import fetch from "node-fetch";
 import * as querystring from "querystring";
+import { URL } from "url";
 import { bug, nonNaN } from "./util";
 
 type BothScores = Pick<MetacriticResult, "metascore" | "userscore">;
@@ -142,26 +143,31 @@ export async function getInfo(game: string, platforms: MetacriticPlatform[]): Pr
 }
 
 async function getProduct(game: string): Promise<MetacriticSearchResult | undefined> {
+    const searchUrl = "https://www.metacritic.com/autosearch";
     const gameStr = querystring.escape(game);
-    const searchUrl = `https://www.metacritic.com/search/game/${gameStr}/results`;
 
-    const searchPageText = await fetch(searchUrl).then(res => res.text());
-    const searchPage = cheerio.load(searchPageText);
+    const postData = `search_term=${gameStr}`;
 
-    // choose one of the products found on the search page:
+    const searchResult = await fetch(searchUrl, {
+        method: "POST",
+        body: postData,
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "X-Requested-With": "XMLHttpRequest",
+        }
+    })
+        .then(res => res.json());
 
-    const product = searchPage(".main_stats").first();
-    const anchor = product.parent().find("a");
-    if (anchor.length === 0) return undefined;
+    if (!searchResult.autoComplete) bug();
 
-    const name = anchor.text().trim();
-    const href = anchor.attr("href");
-    if (!href) bug();
+    const topProduct = searchResult.autoComplete[0];
+    if (!topProduct) return undefined;
 
-    const reviewUrl = absoluteUrl(href);
+    const reviewUrl = topProduct.url;
     if (!reviewUrl) bug();
 
-    const platform = platformFromUrl(href);
+    const name = topProduct.name
+    const platform = platformFromAbsoluteUrl(reviewUrl);
 
     return {
         name,
@@ -181,7 +187,7 @@ function getOtherPlatformUrls(page: cheerio.Root, platforms: MetacriticPlatform[
             const href = tagElem.attribs && tagElem.attribs["href"];
             if (!href) bug();
 
-            const platform = platformFromUrl(href);
+            const platform = platformFromRelativeUrl(href);
 
             if (platforms.includes(platform)) {
                 urls.push(absoluteUrl(href));
@@ -220,9 +226,15 @@ async function getScores(scorePage: cheerio.Root): Promise<BothScores> {
 }
 
 /** url looks like: /game/platform-name/game-name */
-function platformFromUrl(url: string): MetacriticPlatform {
+function platformFromRelativeUrl(url: string): MetacriticPlatform {
     return url.split("/")[2] as MetacriticPlatform
         ?? bug();
+}
+
+/** url looks like: https://www.metacritic.com/game/platform-name/game-name */
+function platformFromAbsoluteUrl(url: string): MetacriticPlatform {
+    const parsedUrl = new URL(url);
+    return platformFromRelativeUrl(parsedUrl.pathname);
 }
 
 export function toPlatform(str: string): MetacriticPlatform | undefined {
