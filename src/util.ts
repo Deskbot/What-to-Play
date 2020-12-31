@@ -45,6 +45,24 @@ export function logAndDefault<E,T>(val: T): (err: E) => T {
     };
 }
 
+export function minBy<T>(arr: T[], toNum: (elem: T) => number): T | undefined {
+    if (arr.length === 0) return undefined;
+
+    let smallestNum = Infinity;
+    let smallest: T | undefined;
+
+    for (const elem of arr) {
+        const num = toNum(elem);
+
+        if (num < smallestNum) {
+            smallestNum = num;
+            smallest = elem;
+        }
+    }
+
+    return smallest;
+}
+
 export function nonNaN<T>(num: number, fallback: T): number | T {
     if (Number.isNaN(num)) {
         return fallback;

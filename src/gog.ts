@@ -2,7 +2,7 @@ import * as cheerio from "cheerio";
 import fetch from "node-fetch";
 import * as levenshtein from "fastest-levenshtein";
 import * as querystring from "querystring";
-import { bug, nonNaN, RecursivePartial } from "./util";
+import { bug, minBy, nonNaN, RecursivePartial } from "./util";
 
 export interface GogResult {
     name: string;
@@ -67,24 +67,16 @@ async function search(game: string): Promise<TargetGame | undefined> {
     const searchData = searchDataMaybeInvalid as GogSearch;
 
     // find best match
-
-    let closestDistance = Infinity;
-    let closest: GogSearchProduct | undefined;
-
-    for (const product of searchData.products) {
-        if (!product) return undefined;
+    const closest = minBy(searchData.products, product => {
+        if (!product) return bug();
         if (typeof product.url !== "string") bug();
         if (typeof product.title !== "string") bug();
 
-        const distance = levenshtein.distance(game, product.title);
-
-        if (distance < closestDistance) {
-            closestDistance = distance;
-            closest = product;
-        }
-    }
+        return levenshtein.distance(game, product.title);
+    });
 
     if (!closest) return undefined;
+
     const url = absoluteUrl(closest.url);
     const name = closest.title;
 
