@@ -86,7 +86,7 @@ async function awaitPair<A, B>([a, promiseB]: [A, Promise<B>]): Promise<[A, B]> 
     return [a, await promiseB];
 }
 
-export async function getInfo(game: string, platforms: MetacriticPlatform[]): Promise<MetacriticResult | undefined> {
+export async function getData(game: string, platforms: MetacriticPlatform[]): Promise<MetacriticResult | undefined> {
     const productData = await getProduct(game);
 
     if (productData === undefined) return undefined;

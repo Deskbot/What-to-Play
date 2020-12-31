@@ -11,7 +11,7 @@ export type SteamResult = {
     url: string;
 };
 
-export async function getInfo(game: string): Promise<SteamResult | undefined> {
+export async function getData(game: string): Promise<SteamResult | undefined> {
     const gameStr = querystring.escape(game);
     const searchUrl = `https://store.steampowered.com/search/?term=${gameStr}`;
     const searchPage = cheerio.load(await getPage(searchUrl));

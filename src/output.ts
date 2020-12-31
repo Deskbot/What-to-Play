@@ -53,8 +53,8 @@ function toHyperlink(url: string, text: string | number): string {
 
 export async function getData(game: string, platforms: MetacriticPlatform[]): Promise<AllData> {
     const gogDataProm = gog.getData(game);
-    const metacriticDataProm = metacritic.getInfo(game, platforms);
-    const steamDataProm = steam.getInfo(game);
+    const metacriticDataProm = metacritic.getData(game, platforms);
+    const steamDataProm = steam.getData(game);
     const hltbDataProm = hltb.getData(game);
 
     // spawn all promises before blocking on their results
