@@ -64,6 +64,24 @@ async function getStorePage(url: string): Promise<string> {
     return await res.text();
 }
 
+function reviewRowToPercent(r: any): number | undefined {
+    if (!r.attribs || !r.attribs["data-tooltip-html"]) {
+        // some steam store pages have no reviews
+        return undefined;
+    }
+
+    const row = r as cheerio.TagElement;
+
+    const recentReviewText = row.attribs["data-tooltip-html"];
+
+    // the percent is at the start and consists of up to 3 characters followed by a % sign
+    const recentReviewPercentStr = recentReviewText
+        .substr(0, 3)
+        .replace(/[^0-9]/g, "");
+
+    return nonNaN(parseInt(recentReviewPercentStr), undefined);
+}
+
 async function searchGame(game: string): Promise<SteamSearchResult | undefined> {
     const gameStr = querystring.escape(game);
     const searchUrl = `https://store.steampowered.com/search/?term=${gameStr}`;
@@ -81,22 +99,4 @@ async function searchGame(game: string): Promise<SteamSearchResult | undefined> 
         name,
         url,
     };
-}
-
-function reviewRowToPercent(r: any): number | undefined {
-    if (!r.attribs || !r.attribs["data-tooltip-html"]) {
-        // some steam store pages have no reviews
-        return undefined;
-    }
-
-    const row = r as cheerio.TagElement;
-
-    const recentReviewText = row.attribs["data-tooltip-html"];
-
-    // the percent is at the start and consists of up to 3 characters followed by a % sign
-    const recentReviewPercentStr = recentReviewText
-        .substr(0, 3)
-        .replace(/[^0-9]/g, "");
-
-    return nonNaN(parseInt(recentReviewPercentStr), undefined);
 }

@@ -141,40 +141,6 @@ export async function getData(game: string, platforms: MetacriticPlatform[]): Pr
     };
 }
 
-async function searchGame(game: string): Promise<MetacriticSearchResult | undefined> {
-    const searchUrl = "https://www.metacritic.com/autosearch";
-    const gameStr = querystring.escape(game);
-
-    const postData = `search_term=${gameStr}`;
-
-    const searchResult = await fetch(searchUrl, {
-        method: "POST",
-        body: postData,
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-            "X-Requested-With": "XMLHttpRequest",
-        }
-    })
-        .then(res => res.json());
-
-    if (!searchResult.autoComplete) bug();
-
-    const topProduct = searchResult.autoComplete[0];
-    if (!topProduct) return undefined;
-
-    const reviewUrl = topProduct.url;
-    if (!reviewUrl) bug();
-
-    const name = topProduct.name
-    const platform = platformFromAbsoluteUrl(reviewUrl);
-
-    return {
-        name,
-        platform,
-        reviewUrl,
-    };
-}
-
 function getOtherPlatformUrls(page: cheerio.Root, platforms: MetacriticPlatform[]): string[] {
     const urls = [] as string[];
 
@@ -234,6 +200,40 @@ function platformFromRelativeUrl(url: string): MetacriticPlatform {
 function platformFromAbsoluteUrl(url: string): MetacriticPlatform {
     const parsedUrl = new URL(url);
     return platformFromRelativeUrl(parsedUrl.pathname);
+}
+
+async function searchGame(game: string): Promise<MetacriticSearchResult | undefined> {
+    const searchUrl = "https://www.metacritic.com/autosearch";
+    const gameStr = querystring.escape(game);
+
+    const postData = `search_term=${gameStr}`;
+
+    const searchResult = await fetch(searchUrl, {
+        method: "POST",
+        body: postData,
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "X-Requested-With": "XMLHttpRequest",
+        }
+    })
+        .then(res => res.json());
+
+    if (!searchResult.autoComplete) bug();
+
+    const topProduct = searchResult.autoComplete[0];
+    if (!topProduct) return undefined;
+
+    const reviewUrl = topProduct.url;
+    if (!reviewUrl) bug();
+
+    const name = topProduct.name
+    const platform = platformFromAbsoluteUrl(reviewUrl);
+
+    return {
+        name,
+        platform,
+        reviewUrl,
+    };
 }
 
 export function toPlatform(str: string): MetacriticPlatform | undefined {
