@@ -1,8 +1,9 @@
 import * as cheerio from "cheerio";
 import fetch from "node-fetch";
+import * as levenshtein from "fastest-levenshtein";
 import * as querystring from "querystring";
 import { URL } from "url";
-import { bug, nonNaN, RecursivePartial } from "./util";
+import { bug, minBy, nonNaN, RecursivePartial } from "./util";
 
 type BothScores = Pick<MetacriticResult, "metascore" | "userscore">;
 
@@ -48,10 +49,12 @@ export interface MetacriticResult {
 }
 
 interface MetacriticSearch {
-    autoComplete: Array<{
-        name: string,
-        url: string,
-    }>;
+    autoComplete: Array<MetacriticSearchProduct>;
+}
+
+interface MetacriticSearchProduct {
+    name: string;
+    url: string;
 }
 
 interface TargetGame {
@@ -215,7 +218,7 @@ async function search(game: string): Promise<TargetGame | undefined> {
 
     const postData = `search_term=${gameStr}`;
 
-    const searchResult = await fetch(searchUrl, {
+    const searchResultMaybeInvalid = await fetch(searchUrl, {
         method: "POST",
         body: postData,
         headers: {
@@ -225,17 +228,22 @@ async function search(game: string): Promise<TargetGame | undefined> {
     })
         .then(res => res.json()) as RecursivePartial<MetacriticSearch>;
 
-    if (!searchResult.autoComplete) bug();
+    if (!searchResultMaybeInvalid.autoComplete) bug();
+    const searchResult = searchResultMaybeInvalid as MetacriticSearch;
 
-    const topProduct = searchResult.autoComplete[0];
-    if (!topProduct) return undefined;
+    // find best match
+    const closest = minBy(searchResult.autoComplete, product => {
+        if (!product) return bug();
+        if (typeof product.name !== "string") bug();
+        if (typeof product.url !== "string") bug();
 
-    const name = topProduct.name;
-    const reviewUrl = topProduct.url;
+        return levenshtein.distance(game, product.name);
+    });
 
-    if (!name) bug();
-    if (!reviewUrl) bug();
+    if (!closest) return undefined;
 
+    const name = closest.name;
+    const reviewUrl = closest.url;
     const platform = platformFromAbsoluteUrl(reviewUrl);
 
     return {

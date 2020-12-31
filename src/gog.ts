@@ -69,8 +69,8 @@ async function search(game: string): Promise<TargetGame | undefined> {
     // find best match
     const closest = minBy(searchData.products, product => {
         if (!product) return bug();
-        if (typeof product.url !== "string") bug();
         if (typeof product.title !== "string") bug();
+        if (typeof product.url !== "string") bug();
 
         return levenshtein.distance(game, product.title);
     });
