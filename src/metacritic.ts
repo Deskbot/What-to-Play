@@ -2,7 +2,7 @@ import * as cheerio from "cheerio";
 import fetch from "node-fetch";
 import * as querystring from "querystring";
 import { URL } from "url";
-import { bug, nonNaN } from "./util";
+import { bug, nonNaN, RecursivePartial } from "./util";
 
 type BothScores = Pick<MetacriticResult, "metascore" | "userscore">;
 
@@ -48,6 +48,13 @@ export interface MetacriticResult {
 }
 
 interface MetacriticSearch {
+    autoComplete: Array<{
+        name: string,
+        url: string,
+    }>;
+}
+
+interface TargetGame {
     name: string;
     platform: MetacriticPlatform;
     reviewUrl: string;
@@ -202,7 +209,7 @@ function platformFromAbsoluteUrl(url: string): MetacriticPlatform {
     return platformFromRelativeUrl(parsedUrl.pathname);
 }
 
-async function search(game: string): Promise<MetacriticSearch | undefined> {
+async function search(game: string): Promise<TargetGame | undefined> {
     const searchUrl = "https://www.metacritic.com/autosearch";
     const gameStr = querystring.escape(game);
 
@@ -216,17 +223,19 @@ async function search(game: string): Promise<MetacriticSearch | undefined> {
             "X-Requested-With": "XMLHttpRequest",
         }
     })
-        .then(res => res.json());
+        .then(res => res.json()) as RecursivePartial<MetacriticSearch>;
 
     if (!searchResult.autoComplete) bug();
 
     const topProduct = searchResult.autoComplete[0];
     if (!topProduct) return undefined;
 
+    const name = topProduct.name;
     const reviewUrl = topProduct.url;
+
+    if (!name) bug();
     if (!reviewUrl) bug();
 
-    const name = topProduct.name
     const platform = platformFromAbsoluteUrl(reviewUrl);
 
     return {

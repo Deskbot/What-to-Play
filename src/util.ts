@@ -58,6 +58,12 @@ export function printable(val: string | number | undefined): string {
     return val.toString();
 }
 
+export type RecursivePartial<T> = {
+    [K in keyof T]?: T[K] extends (infer U)[]
+        ? RecursivePartial<U>[]
+        : RecursivePartial<T[K]>
+};
+
 /**
  * Takes asynchronous functions and spawns them
  * only when the last function to be given has been spawned and resolved.
