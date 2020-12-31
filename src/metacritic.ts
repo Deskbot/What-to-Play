@@ -47,7 +47,7 @@ export interface MetacriticResult {
     userscoreUrl?: string;
 }
 
-interface MetacriticSearchResult {
+interface MetacriticSearch {
     name: string;
     platform: MetacriticPlatform;
     reviewUrl: string;
@@ -87,7 +87,7 @@ async function awaitPair<A, B>([a, promiseB]: [A, Promise<B>]): Promise<[A, B]> 
 }
 
 export async function getData(game: string, platforms: MetacriticPlatform[]): Promise<MetacriticResult | undefined> {
-    const productData = await searchGame(game);
+    const productData = await search(game);
     if (productData === undefined) return undefined;
 
     const { name, platform, reviewUrl } = productData;
@@ -202,7 +202,7 @@ function platformFromAbsoluteUrl(url: string): MetacriticPlatform {
     return platformFromRelativeUrl(parsedUrl.pathname);
 }
 
-async function searchGame(game: string): Promise<MetacriticSearchResult | undefined> {
+async function search(game: string): Promise<MetacriticSearch | undefined> {
     const searchUrl = "https://www.metacritic.com/autosearch";
     const gameStr = querystring.escape(game);
 

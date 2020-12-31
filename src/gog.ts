@@ -9,7 +9,7 @@ export interface GogResult {
     url: string;
 }
 
-interface GogData {
+interface GogSearch {
     products: {
         rating: number;
         title: string;
@@ -25,7 +25,7 @@ export async function getData(game: string): Promise<GogResult | undefined> {
     const gameStr = querystring.escape(game);
     const gogDataUrl = `https://www.gog.com/games/ajax/filtered?limit=1&search=${gameStr}`;
 
-    const searchData = await fetch(gogDataUrl).then(res => res.json()) as Partial<GogData> | null;
+    const searchData = await fetch(gogDataUrl).then(res => res.json()) as Partial<GogSearch> | null;
     const gameData = searchData?.products && searchData.products[0];
 
     if (!gameData) return undefined;
