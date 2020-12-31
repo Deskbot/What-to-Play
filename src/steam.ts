@@ -1,8 +1,9 @@
 
 import * as cheerio from "cheerio";
 import fetch from "node-fetch";
+import * as levenshtein from "fastest-levenshtein";
 import * as querystring from "querystring";
-import { bug, nonNaN } from "./util";
+import { bug, minBy, nonNaN } from "./util";
 
 export interface SteamResult {
     name: string;
@@ -24,7 +25,7 @@ export async function getData(game: string): Promise<SteamResult | undefined> {
 
     // get scores from product page
 
-    const storePage = cheerio.load(await getStorePage(url));
+    const storePage = cheerio.load(await getSteamPage(url));
     const reviewInfos = storePage(".user_reviews_summary_row");
 
     let recentScore: number | undefined;
@@ -55,7 +56,7 @@ export async function getData(game: string): Promise<SteamResult | undefined> {
     };
 }
 
-async function getStorePage(url: string): Promise<string> {
+async function getSteamPage(url: string): Promise<string> {
     const res = await fetch(url, {
         headers: {
             "Cookie": "birthtime=281318401" // bypass age restriction
@@ -84,14 +85,24 @@ function reviewRowToPercent(r: any): number | undefined {
 
 async function searchGame(game: string): Promise<SteamSearchResult | undefined> {
     const gameStr = querystring.escape(game);
-    const searchUrl = `https://store.steampowered.com/search/?term=${gameStr}`;
-    const searchPage = cheerio.load(await getStorePage(searchUrl));
+    const searchUrl = `https://store.steampowered.com/search/suggest?f=games&cc=US&term=${gameStr}`;
+    const searchDropdownHTML = await getSteamPage(searchUrl);
 
-    const searchResultRow = searchPage(".search_result_row").first();
-    const name = searchResultRow.find(".title").first().text();
-    const url = searchResultRow.attr("href");
+    const searchDom = cheerio.load(searchDropdownHTML);
 
-    if (searchResultRow.length === 0) return undefined;
+    const matches = searchDom(".match").toArray();
+
+    const bestMatch = minBy(matches, match => {
+        const name = searchDom(match).find(".match_name").text();
+        return levenshtein.distance(game, name);
+    });
+
+    if (!bestMatch) return undefined;
+
+    const bestElem = searchDom(bestMatch);
+    const name = bestElem.find(".match_name").text();
+    const url = bestElem.attr("href");
+
     if (!name) bug();
     if (!url) bug();
 
