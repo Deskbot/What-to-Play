@@ -4,27 +4,25 @@ import fetch from "node-fetch";
 import * as querystring from "querystring";
 import { bug, nonNaN } from "./util";
 
-export type SteamResult = {
+export interface SteamResult {
     name: string;
     recentScore?: number;
     allTimeScore?: number;
     url: string;
-};
+}
+
+interface SteamSearchResult {
+    name: string;
+    url: string;
+}
 
 export async function getData(game: string): Promise<SteamResult | undefined> {
-    const gameStr = querystring.escape(game);
-    const searchUrl = `https://store.steampowered.com/search/?term=${gameStr}`;
-    const searchPage = cheerio.load(await getPage(searchUrl));
+    const productData = await getProduct(game);
+    if (productData === undefined) return undefined;
 
-    const searchResultRow = searchPage(".search_result_row").first();
-    const realName = searchResultRow.find(".title").first().text();
-    const scoreUrl = searchResultRow.attr("href");
+    const { name, url } = productData;
 
-    if (searchResultRow.length === 0) return undefined;
-    if (!realName) bug();
-    if (!scoreUrl) bug();
-
-    const storePage = cheerio.load(await getPage(scoreUrl));
+    const storePage = cheerio.load(await getPage(url));
     const reviewInfos = storePage(".user_reviews_summary_row");
 
     let recentScore: number | undefined;
@@ -48,10 +46,10 @@ export async function getData(game: string): Promise<SteamResult | undefined> {
     }
 
     return {
-        name: realName,
+        name,
         recentScore,
         allTimeScore,
-        url: scoreUrl,
+        url,
     };
 }
 
@@ -61,6 +59,25 @@ function getPage(url: string): Promise<string> {
             "Cookie": "birthtime=281318401" // bypass age restriction
         }
     }).then(res => res.text());
+}
+
+async function getProduct(game: string): Promise<SteamSearchResult | undefined> {
+    const gameStr = querystring.escape(game);
+    const searchUrl = `https://store.steampowered.com/search/?term=${gameStr}`;
+    const searchPage = cheerio.load(await getPage(searchUrl));
+
+    const searchResultRow = searchPage(".search_result_row").first();
+    const name = searchResultRow.find(".title").first().text();
+    const url = searchResultRow.attr("href");
+
+    if (searchResultRow.length === 0) return undefined;
+    if (!name) bug();
+    if (!url) bug();
+
+    return {
+        name,
+        url,
+    };
 }
 
 function reviewRowToPercent(r: any): number | undefined {
