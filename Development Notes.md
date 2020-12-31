@@ -132,3 +132,24 @@ I think Damerau–Levenshtein distance is overkill because all websites except o
 Levenshtein distance will probably do. All the other string algorithms I've looked at account for things I don't think we need to consider
 
 The main trouble with matching is when your game's name is a substring of another e.g. Hollow vs Hollow Knight, Dark Souls vs Dark Souls 2. Levenshtein distance will prefer the shorter names.
+Steam's search dropdown only loads 5 results.
+
+--
+
+When searching for "Obra din" in steam the dropdown shows "The Return of the Obra Dinn", but the search page shows no results.
+
+---
+
+steam search dropdown and steam search page show completely different results
+
+e.g. search for "the messenger", dropdown : 1st, search page 4th
+
+or better yet try searching for "dark sou", doesn't appear in search page but does with drop down
+
+---
+
+Searching for "Demons Souls" on opencritic results in demons souls being the third one down but it's got a long string at the end "Demon's Souls (2020 Remake)"
+
+---
+
+I will need to do more testing but Giant Bomb seems to have a decent search engine, and it could be used as the input to all the other websites, giving them an accurate title. But they restrict their API usage to 200/hour, which probably also applies to their main site? https://www.giantbomb.com/api/
