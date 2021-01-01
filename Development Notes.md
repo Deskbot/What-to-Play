@@ -148,6 +148,8 @@ or better yet try searching for "dark sou", doesn't appear in search page but do
 
 ---
 
+Searching for "Demon's Souls" on metacritic only shows the right game if you include the apostraphe.
+
 Searching for "Demons Souls" on opencritic results in demons souls being the third one down but it's got a long string at the end "Demon's Souls (2020 Remake)"
 
 ---
