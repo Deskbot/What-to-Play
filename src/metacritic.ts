@@ -1,8 +1,8 @@
 import * as cheerio from "cheerio";
 import fetch from "node-fetch";
-import { LCS } from "js-lcs";
 import * as querystring from "querystring";
-import { bug, maxBy, nonNaN } from "./util";
+import { bug, nonNaN } from "./util";
+import { closestSearchResult } from "./optimisation";
 
 type BothScores = Pick<MetacriticResult, "metascore" | "userscore">;
 
@@ -210,22 +210,21 @@ async function search(game: string): Promise<TargetGame | undefined> {
     const searchPageText = await fetch(searchUrl).then(res => res.text());
     const searchPage = cheerio.load(searchPageText);
 
-    const products = searchPage(".main_stats").find("a")
+    const searchResults = searchPage(".main_stats").find("a")
         .toArray()
         .map(searchPage);
 
-    const gameLower = game.toLowerCase();
-    const bestMatch = maxBy(products, product => {
-        const name = product.text().trim();
-        if (!name) bug();
-        return LCS.size(gameLower, name.toLowerCase());
-    });
+    const bestResult = closestSearchResult(
+        game,
+        searchResults,
+        product => product.text().trim()
+    );
 
-    if (!bestMatch) return undefined;
+    if (!bestResult) return undefined;
 
-    const name = bestMatch.text().trim();
+    const name = bestResult.text().trim();
 
-    const href = bestMatch.attr("href");
+    const href = bestResult.attr("href");
     if (!href) bug();
 
     const reviewUrl = absoluteUrl(href);

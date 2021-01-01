@@ -1,9 +1,9 @@
 
 import * as cheerio from "cheerio";
 import fetch from "node-fetch";
-import { LCS } from "js-lcs";
 import * as querystring from "querystring";
-import { bug, maxBy, nonNaN } from "./util";
+import { closestSearchResult } from "./optimisation";
+import { bug, nonNaN } from "./util";
 
 export interface SteamResult {
     name: string;
@@ -90,19 +90,20 @@ async function searchGame(game: string): Promise<SteamSearchResult | undefined> 
 
     const searchDom = cheerio.load(searchDropdownHTML);
 
-    const matches = searchDom(".match").toArray();
+    const searchResults = searchDom(".match")
+        .toArray()
+        .map(searchDom);
 
-    const gameLower = game.toLowerCase();
-    const bestMatch = maxBy(matches, match => {
-        const name = searchDom(match).find(".match_name").text();
-        return LCS.size(gameLower, name.toLowerCase());
-    });
+    const bestResult = closestSearchResult(
+        game,
+        searchResults,
+        product => product.find(".match_name").text()
+    );
 
-    if (!bestMatch) return undefined;
+    if (!bestResult) return undefined;
 
-    const bestElem = searchDom(bestMatch);
-    const name = bestElem.find(".match_name").text();
-    const url = bestElem.attr("href");
+    const name = bestResult.find(".match_name").text();
+    const url = bestResult.attr("href");
 
     if (!name) bug();
     if (!url) bug();

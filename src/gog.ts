@@ -1,8 +1,8 @@
 import * as cheerio from "cheerio";
 import fetch from "node-fetch";
-import { LCS } from "js-lcs";
 import * as querystring from "querystring";
-import { bug, maxBy, nonNaN, RecursivePartial } from "./util";
+import { bug, nonNaN, RecursivePartial } from "./util";
+import { closestSearchResult } from "./optimisation";
 
 export interface GogResult {
     name: string;
@@ -66,20 +66,24 @@ async function search(game: string): Promise<TargetGame | undefined> {
     if (!searchDataMaybeInvalid?.products) bug();
     const searchData = searchDataMaybeInvalid as GogSearch;
 
-    // find best match
-    const gameLower = game.toLowerCase();
-    const closest = maxBy(searchData.products, product => {
+    for (const product of searchData.products) {
         if (!product) return bug();
         if (typeof product.title !== "string") bug();
         if (typeof product.url !== "string") bug();
+    }
 
-        return LCS.size(gameLower, product.title.toLowerCase());
-    });
+    // find best match
 
-    if (!closest) return undefined;
+    const bestResult = closestSearchResult(
+        game,
+        searchData.products,
+        searchResult => searchResult.title.toLowerCase()
+    );
 
-    const url = absoluteUrl(closest.url);
-    const name = closest.title;
+    if (!bestResult) return undefined;
+
+    const url = absoluteUrl(bestResult.url);
+    const name = bestResult.title;
 
     return {
         name,

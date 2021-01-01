@@ -1,8 +1,8 @@
 import * as cheerio from "cheerio";
 import fetch from "node-fetch";
-import { LCS } from "js-lcs";
 import * as querystring from "querystring";
-import { bug, maxBy } from "./util";
+import { bug } from "./util";
+import { closestSearchResult } from "./optimisation";
 
 export interface HowLongToBeatResult {
     name: string;
@@ -38,13 +38,11 @@ export async function getData(game: string): Promise<HowLongToBeatResult | undef
     const searchResultElems = searchPage(".search_list_details");
     const searchResults = searchResultElems.toArray().map(searchPage);
 
-    const gameLower = game.toLowerCase();
-    const bestResult = maxBy(searchResults, searchResult => {
-        const nameElem = searchResult.find("a").first();
-        const name = nameElem.text();
-
-        return LCS.size(gameLower, name.toLowerCase());
-    });
+    const bestResult = closestSearchResult(
+        game,
+        searchResults,
+        searchResult => searchResult.find("a").first().text().trim()
+    );
 
     if (!bestResult) return undefined;
 

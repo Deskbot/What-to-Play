@@ -38,24 +38,6 @@ export function escapeDoubleQuotes(s: string, replacement: string): string {
     return s.replace(allDoubleQuotes, replacement);
 }
 
-export function maxBy<T>(arr: T[], toNum: (elem: T) => number): T | undefined {
-    if (arr.length === 0) return undefined;
-
-    let biggestNum = -Infinity;
-    let biggest: T | undefined;
-
-    for (const elem of arr) {
-        const num = toNum(elem);
-
-        if (num > biggestNum) {
-            biggestNum = num;
-            biggest = elem;
-        }
-    }
-
-    return biggest;
-}
-
 export function nonNaN<T>(num: number, fallback: T): number | T {
     if (Number.isNaN(num)) {
         return fallback;
