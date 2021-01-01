@@ -178,3 +178,67 @@ fear            -> FEAR
 ---
 
 Searching on metacritic using https://www.metacritic.com/autosearch (typing into the search box to get a dropdown) is unreliable. It 504s too often.
+
+---
+
+Quality of latest set of matches
+
+!!! things I could do to improve it that seem doable
+!!  things I could do to improve it that would be hard
+!   things I can't really do because it would cause other issues
+
+!! Steam tends to give overly long names to game. I don't know a way to get a smaller number out of it.
+
+Yonder
+steam: !!! I could filter out dlc (on steam) (but maybe you want to search for dlc)
+metacritic: !! I could have picked closest leven where the string started with the right thing
+
+minimetro
+metacritic: can't handle lack of space
+gog: can't handle lack of space
+
+luna nights
+metacritic: has bad data
+hltb: !! I could change best match algorithm with something that prefers "touhou luna nights" over "luna knights", however "touhou nights" matches correctly
+
+fallout new vegas ultimate edition
+steam: bad search engine, also full search page gets it wrong
+
+the room
+gog: ! matches game with "the room" as a substring, doesn't have "the room"
+
+journey
+! ditto
+
+fallout
+steam: gets fallout 4 because fallout 1 is called "Fallout: A Post Nuclear Role Playing Game" ahahahah
+
+nioh
+ditto but "Nioh: Complete Edition / 仁王 Complete Edition" is longer than "Nioh 2 – The Complete Edition"
+
+mega man x
+ditto
+
+Trine 4
+gog: finds "Phantom Doctrine", which is fair I suppose
+
+fear
+gog: !!! "fear equation" actually wanted "f.e.a.r. platinum" could have achieved this by doing the levenshtein distance of the strings with all non [a-z0-9] characters removed, which would give both "fear equation" and "f.e.a.r. platinum" a distance of 9. But "f.e.a.r. platinum was higher up" therefore it would have been picked.
+
+ghost runner
+steam: doesn't find "ghostrunner" because it needs the lack of a space, therefore for steam only. If I remove all spaces from the input, it becomes very flaky
+
+e.g. "wayofthepassive" -> "way of the passive fist", but
+     "wayofthepassivef" -> nothing
+     "wayofthepassivefist" -> nothing
+
+I don't think there's a way to correct the user input here without relying on a better search engine from a different website. But also there is an ios game called "ghost runner", which is what metacritic finds, so probably can't do anything here. A user will see that it didn't get the result and check for themself then adjust their input/output probably.
+
+hob
+hltb: !! xenophobe, another that could be fixed by preferring ones that start with the string
+
+the last door
+steam: !!! The Last Door Season 2 Soundtrack, another case of dlc
+
+NORTH
+hltb: !!! 0°N 0°W (due to the levenshtein function for treating capitals different to lower case)
