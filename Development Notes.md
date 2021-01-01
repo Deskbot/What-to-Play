@@ -259,3 +259,13 @@ devil may cry 3
 metacritic: matches "devil may cry 4" instead of "devil may cry 3: some subtitle/special edition"
     @ @@ a case of preferring the beginning of the game, or... longest common substring,
         I should probably compare LCS to the current output and check for differences in results. I suspect that anything spelled wrong isn't going to appear anyway. levenshtein has the advantage of working better with typos
+
+---
+
+after implementing LCS followed by Levenshtein
+
+@ fixable with making steam redirect dlc to the main game
+
+mega man x
+steam: @ gets 'Mega Man X Sound Collection' instead of 'Mega Man X Legacy Collection'
+

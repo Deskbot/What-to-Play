@@ -8,7 +8,9 @@ export function closestSearchResult<T>(game: string, products: T[], getName: (pr
 
     let bestMatch: T | undefined;
 
-    let matchLcs = -Infinity; // bigger is better
+    // anything below 3 is insignificant
+    // a product with lcs = 3 can still be outputted because it equals this
+    let matchLcs = 3; // bigger is better
     let matchLevenshtein = Infinity; // smaller is better
 
     for (const product of products) {
