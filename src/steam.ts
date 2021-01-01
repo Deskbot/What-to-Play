@@ -92,9 +92,10 @@ async function searchGame(game: string): Promise<SteamSearchResult | undefined> 
 
     const matches = searchDom(".match").toArray();
 
+    const gameLower = game.toLowerCase();
     const bestMatch = minBy(matches, match => {
         const name = searchDom(match).find(".match_name").text();
-        return levenshtein.distance(game, name);
+        return levenshtein.distance(gameLower, name.toLowerCase());
     });
 
     if (!bestMatch) return undefined;

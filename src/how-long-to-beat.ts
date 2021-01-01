@@ -38,11 +38,12 @@ export async function getData(game: string): Promise<HowLongToBeatResult | undef
     const searchResultElems = searchPage(".search_list_details");
     const searchResults = searchResultElems.toArray().map(searchPage);
 
+    const gameLower = game.toLowerCase();
     const bestResult = minBy(searchResults, searchResult => {
         const nameElem = searchResult.find("a").first();
         const name = nameElem.text();
 
-        return levenshtein.distance(game, name);
+        return levenshtein.distance(gameLower, name.toLowerCase());
     });
 
     if (!bestResult) return undefined;

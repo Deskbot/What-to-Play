@@ -214,10 +214,11 @@ async function search(game: string): Promise<TargetGame | undefined> {
         .toArray()
         .map(searchPage);
 
+    const gameLower = game.toLowerCase();
     const bestMatch = minBy(products, product => {
         const name = product.text().trim();
         if (!name) bug();
-        return levenshtein.distance(game, name);
+        return levenshtein.distance(gameLower, name.toLowerCase());
     });
 
     if (!bestMatch) return undefined;
