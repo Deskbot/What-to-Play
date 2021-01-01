@@ -1,7 +1,8 @@
 import * as cheerio from "cheerio";
 import fetch from "node-fetch";
+import * as levenshtein from "fastest-levenshtein";
 import * as querystring from "querystring";
-import { bug } from "./util";
+import { bug, minBy } from "./util";
 
 export interface HowLongToBeatResult {
     name: string;
@@ -30,30 +31,26 @@ const fieldMap: Record<string, keyof HowLongToBeatResult["times"] | undefined> =
 } as const;
 
 export async function getData(game: string): Promise<HowLongToBeatResult | undefined> {
-    // search for game on the website
+    const searchPage = await getSearchPage(game);
 
-    const searchUrl = "https://howlongtobeat.com/search_results?page=1";
-    const gameStr = querystring.escape(game);
-    const postData = `queryString=${gameStr}&t=games&sorthead=popular&sortd=Normal Order`;
+    // choose the best result
 
-    const html = await fetch(searchUrl, {
-        method: "POST",
-        body: postData,
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded"
-        }
-    })
-    .then(res => res.text());
+    const searchResultElems = searchPage(".search_list_details");
+    const searchResults = searchResultElems.toArray().map(searchPage);
 
-    // get data about the game out of the results
+    const bestResult = minBy(searchResults, searchResult => {
+        const nameElem = searchResult.find("a").first();
+        const name = nameElem.text();
 
-    const searchPage = cheerio.load(html);
-    const searchResult = searchPage(".search_list_details").first(); // only look at first result
+        return levenshtein.distance(game, name);
+    });
 
-    if (searchResult.length === 0) return undefined;
+    if (!bestResult) return undefined;
+
+    // get data about the game out of the best result
 
     // get name
-    const nameElem = searchResult.find("a").first();
+    const nameElem = bestResult.find("a").first();
     const name = nameElem.text();
     if (!name) bug();
 
@@ -62,7 +59,7 @@ export async function getData(game: string): Promise<HowLongToBeatResult | undef
 
     // get completion times
 
-    const gridElems = searchResult
+    const gridElems = bestResult
         .find(".search_list_tidbit,.search_list_tidbit_short,.search_list_tidbit_long")
         .toArray();
 
@@ -93,6 +90,23 @@ export async function getData(game: string): Promise<HowLongToBeatResult | undef
         times,
         url,
     };
+}
+
+/** search for game on the website */
+async function getSearchPage(game: string): Promise<cheerio.Root> {
+    const searchUrl = "https://howlongtobeat.com/search_results?page=1";
+    const gameStr = querystring.escape(game);
+    const postData = `queryString=${gameStr}&t=games&sorthead=popular&sortd=Normal Order`;
+
+    const res = await fetch(searchUrl, {
+        method: "POST",
+        body: postData,
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        }
+    });
+
+    return cheerio.load(await res.text());
 }
 
 function getTimeFromElem(elem: cheerio.Cheerio): number | undefined {
