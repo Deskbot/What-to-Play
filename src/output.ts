@@ -3,7 +3,7 @@ import * as hltb from "./how-long-to-beat";
 import * as metacritic from "./metacritic";
 import * as steam from "./steam";
 import { MetacriticPlatform } from "./metacritic";
-import { average, bindUndefined, csvFriendly, escapeDoubleQuotes, logAndDefault, printable } from "./util";
+import { average, bindUndefined, csvFriendly, escapeDoubleQuotes, printable } from "./util";
 
 export interface AllData {
     game: string;
@@ -112,15 +112,21 @@ export async function getCsv(game: string, platforms: MetacriticPlatform[]): Pro
 }
 
 export async function getData(game: string, platforms: MetacriticPlatform[]): Promise<AllData> {
-    const gogDataProm = gog.getData(game);
-    const metacriticDataProm = metacritic.getData(game, platforms);
-    const steamDataProm = steam.getData(game);
-    const hltbDataProm = hltb.getData(game);
+    const handleError = (err: any, website: string) => {
+        console.error(`Error: code failure, when getting "${game}" from ${website}`);
+        console.error(err);
+        return undefined;
+    }
+
+    const gogDataProm = gog.getData(game)                         .catch(err => handleError(err, "GOG"));
+    const metacriticDataProm = metacritic.getData(game, platforms).catch(err => handleError(err, "Metacritic"));
+    const steamDataProm = steam.getData(game)                     .catch(err => handleError(err, "Steam"));
+    const hltbDataProm = hltb.getData(game)                       .catch(err => handleError(err, "How Long to Beat"));
 
     // spawn all promises before blocking on their results
-    const gogData = await gogDataProm.catch(logAndDefault(undefined));
-    const metacriticData = await metacriticDataProm.catch(logAndDefault(undefined));
-    const steamData = await steamDataProm.catch(logAndDefault(undefined));
+    const gogData = await gogDataProm;
+    const metacriticData = await metacriticDataProm;
+    const steamData = await steamDataProm;
 
     return {
         game,
@@ -128,7 +134,7 @@ export async function getData(game: string, platforms: MetacriticPlatform[]): Pr
         gog: gogData,
         metacritic: metacriticData,
         steam: steamData,
-        hltb: await hltbDataProm.catch(logAndDefault(undefined)),
+        hltb: await hltbDataProm,
     };
 }
 

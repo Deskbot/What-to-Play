@@ -38,13 +38,6 @@ export function escapeDoubleQuotes(s: string, replacement: string): string {
     return s.replace(allDoubleQuotes, replacement);
 }
 
-export function logAndDefault<E,T>(val: T): (err: E) => T {
-    return err => {
-        console.error(err);
-        return val;
-    };
-}
-
 export function minBy<T>(arr: T[], toNum: (elem: T) => number): T | undefined {
     if (arr.length === 0) return undefined;
 
