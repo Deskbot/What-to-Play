@@ -174,3 +174,7 @@ trine 4         -> trine 4 mare prince
 minimetro       -> mini metro
 devil may cry 1 -> devil may cry
 fear            -> FEAR
+
+---
+
+Searching on metacritic using https://www.metacritic.com/autosearch (typing into the search box to get a dropdown) is unreliable. It 504s too often.

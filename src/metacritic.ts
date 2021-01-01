@@ -206,51 +206,40 @@ function platformFromRelativeUrl(url: string): MetacriticPlatform {
         ?? bug();
 }
 
-/** url looks like: https://www.metacritic.com/game/platform-name/game-name */
-function platformFromAbsoluteUrl(url: string): MetacriticPlatform {
-    const parsedUrl = new URL(url);
-    return platformFromRelativeUrl(parsedUrl.pathname);
-}
-
 async function search(game: string): Promise<TargetGame | undefined> {
-    const searchUrl = "https://www.metacritic.com/autosearch";
     const gameStr = querystring.escape(game);
+    const searchUrl = `https://www.metacritic.com/search/game/${gameStr}/results`;
 
-    const postData = `search_term=${gameStr}`;
+    const searchPageText = await fetch(searchUrl).then(res => res.text());
+    const searchPage = cheerio.load(searchPageText);
 
-    const searchResultMaybeInvalid = await fetch(searchUrl, {
-        method: "POST",
-        body: postData,
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-            "X-Requested-With": "XMLHttpRequest",
-        }
-    })
-        .then(res => res.json()) as RecursivePartial<MetacriticSearch>;
+    const products = searchPage(".main_stats").find("a")
+        .toArray()
+        .map(searchPage);
 
-    if (!searchResultMaybeInvalid.autoComplete) bug();
-    const searchResult = searchResultMaybeInvalid as MetacriticSearch;
-
-    // find best match
-    const closest = minBy(searchResult.autoComplete, product => {
-        if (!product) return bug();
-        if (typeof product.name !== "string") bug();
-        if (typeof product.url !== "string") bug();
-
-        return levenshtein.distance(game, product.name);
+    const bestMatch = minBy(products, product => {
+        const name = product.text().trim();
+        if (!name) bug();
+        return levenshtein.distance(game, name);
     });
 
-    if (!closest) return undefined;
+    if (!bestMatch) return undefined;
 
-    const name = closest.name;
-    const reviewUrl = closest.url;
-    const platform = platformFromAbsoluteUrl(reviewUrl);
+    const name = bestMatch.text().trim();
+
+    const href = bestMatch.attr("href");
+    if (!href) bug();
+
+    const reviewUrl = absoluteUrl(href);
+    if (!reviewUrl) bug();
+
+    const platform = platformFromRelativeUrl(href);
 
     return {
         name,
         platform,
         reviewUrl,
-    };
+    }
 }
 
 export function toPlatform(str: string): MetacriticPlatform | undefined {
