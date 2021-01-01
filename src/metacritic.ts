@@ -47,11 +47,6 @@ export interface MetacriticResult {
     userscoreUrl?: string;
 }
 
-interface MetacriticSearchProduct {
-    name: string;
-    url: string;
-}
-
 interface TargetGame {
     name: string;
     platform: MetacriticPlatform;
