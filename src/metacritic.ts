@@ -2,8 +2,7 @@ import * as cheerio from "cheerio";
 import fetch from "node-fetch";
 import * as levenshtein from "fastest-levenshtein";
 import * as querystring from "querystring";
-import { URL } from "url";
-import { bug, minBy, nonNaN, RecursivePartial } from "./util";
+import { bug, minBy, nonNaN } from "./util";
 
 type BothScores = Pick<MetacriticResult, "metascore" | "userscore">;
 
@@ -46,10 +45,6 @@ export interface MetacriticResult {
 
     metascoreUrl?: string;
     userscoreUrl?: string;
-}
-
-interface MetacriticSearch {
-    autoComplete: Array<MetacriticSearchProduct>;
 }
 
 interface MetacriticSearchProduct {
@@ -184,6 +179,7 @@ async function getScores(scorePage: cheerio.Root): Promise<BothScores> {
             .find(".main_details") // different
             .find(".metascore_w")
             .find("span") // different
+            .first()
             .text()
             .trim();
 
@@ -191,6 +187,7 @@ async function getScores(scorePage: cheerio.Root): Promise<BothScores> {
         scorePage(".product_scores")
             .find(".side_details") // different
             .find(".metascore_w")
+            .first()
             .text()
             .trim();
 
