@@ -37,43 +37,41 @@ export const csvHeaderRow = csvHeaders.join(",");
 
 export type CsvHeaders = typeof csvHeaders[number];
 
-/**
- * Based on common spreadsheet syntax.
- */
-function toHyperlink(url: string, text: string | number): string {
-    // escape inputs to fit formula syntax
-    url = escapeDoubleQuotes(url, '""');
+function aggregateScore(
+    gogData?: gog.GogResult,
+    metacriticData?: metacritic.MetacriticResult,
+    steamResult?: steam.SteamResult,
+): number | undefined {
+    let scores = [] as number[];
 
-    if (typeof text === "string") {
-        text = escapeDoubleQuotes(text, '""');
+    const gog_score = gogData?.score;
+    const metacritic_metascore = metacriticData?.metascore;
+    const metacritic_userscore = metacriticData?.userscore;
+    const steam_allTimeScore = steamResult?.allTimeScore;
+    const steam_recentScore = steamResult?.recentScore;
+
+    // make all scores out of 100
+    if (gog_score !== undefined) {
+        scores.push(gog_score * 20);
+    }
+    if (metacritic_metascore !== undefined) {
+        scores.push(metacritic_metascore);
+    }
+    if (metacritic_userscore !== undefined) {
+        scores.push(metacritic_userscore * 10);
+    }
+    if (steam_allTimeScore !== undefined) {
+        scores.push(steam_allTimeScore);
+    }
+    if (steam_recentScore !== undefined) {
+        scores.push(steam_recentScore);
     }
 
-    return `=HYPERLINK("${url}", "${text}")`;
-}
+    if (scores.length === 0) {
+        return undefined;
+    }
 
-export async function getData(game: string, platforms: MetacriticPlatform[]): Promise<AllData> {
-    const gogDataProm = gog.getData(game);
-    const metacriticDataProm = metacritic.getData(game, platforms);
-    const steamDataProm = steam.getData(game);
-    const hltbDataProm = hltb.getData(game);
-
-    // spawn all promises before blocking on their results
-    const gogData = await gogDataProm.catch(logAndDefault(undefined));
-    const metacriticData = await metacriticDataProm.catch(logAndDefault(undefined));
-    const steamData = await steamDataProm.catch(logAndDefault(undefined));
-
-    return {
-        game,
-        aggregateScore: aggregateScore(gogData, metacriticData, steamData),
-        gog: gogData,
-        metacritic: metacriticData,
-        steam: steamData,
-        hltb: await hltbDataProm.catch(logAndDefault(undefined)),
-    };
-}
-
-export async function getJson(game: string, platforms: MetacriticPlatform[]): Promise<string> {
-    return JSON.stringify(await getData(game, platforms));
+    return parseFloat(average(scores).toFixed(1));
 }
 
 export async function getCsv(game: string, platforms: MetacriticPlatform[]): Promise<string> {
@@ -113,39 +111,41 @@ export async function getCsv(game: string, platforms: MetacriticPlatform[]): Pro
     return buffer.join(",");
 }
 
-function aggregateScore(
-    gogData?: gog.GogResult,
-    metacriticData?: metacritic.MetacriticResult,
-    steamResult?: steam.SteamResult,
-): number | undefined {
-    let scores = [] as number[];
+export async function getData(game: string, platforms: MetacriticPlatform[]): Promise<AllData> {
+    const gogDataProm = gog.getData(game);
+    const metacriticDataProm = metacritic.getData(game, platforms);
+    const steamDataProm = steam.getData(game);
+    const hltbDataProm = hltb.getData(game);
 
-    const gog_score = gogData?.score;
-    const metacritic_metascore = metacriticData?.metascore;
-    const metacritic_userscore = metacriticData?.userscore;
-    const steam_allTimeScore = steamResult?.allTimeScore;
-    const steam_recentScore = steamResult?.recentScore;
+    // spawn all promises before blocking on their results
+    const gogData = await gogDataProm.catch(logAndDefault(undefined));
+    const metacriticData = await metacriticDataProm.catch(logAndDefault(undefined));
+    const steamData = await steamDataProm.catch(logAndDefault(undefined));
 
-    // make all scores out of 100
-    if (gog_score !== undefined) {
-        scores.push(gog_score * 20);
-    }
-    if (metacritic_metascore !== undefined) {
-        scores.push(metacritic_metascore);
-    }
-    if (metacritic_userscore !== undefined) {
-        scores.push(metacritic_userscore * 10);
-    }
-    if (steam_allTimeScore !== undefined) {
-        scores.push(steam_allTimeScore);
-    }
-    if (steam_recentScore !== undefined) {
-        scores.push(steam_recentScore);
+    return {
+        game,
+        aggregateScore: aggregateScore(gogData, metacriticData, steamData),
+        gog: gogData,
+        metacritic: metacriticData,
+        steam: steamData,
+        hltb: await hltbDataProm.catch(logAndDefault(undefined)),
+    };
+}
+
+export async function getJson(game: string, platforms: MetacriticPlatform[]): Promise<string> {
+    return JSON.stringify(await getData(game, platforms));
+}
+
+/**
+ * Based on common spreadsheet syntax.
+ */
+function toHyperlink(url: string, text: string | number): string {
+    // escape inputs to fit formula syntax
+    url = escapeDoubleQuotes(url, '""');
+
+    if (typeof text === "string") {
+        text = escapeDoubleQuotes(text, '""');
     }
 
-    if (scores.length === 0) {
-        return undefined;
-    }
-
-    return parseFloat(average(scores).toFixed(1));
+    return `=HYPERLINK("${url}", "${text}")`;
 }
