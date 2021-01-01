@@ -2,7 +2,7 @@ import * as cheerio from "cheerio";
 import fetch from "node-fetch";
 import * as querystring from "querystring";
 import { bug, nonNaN, RecursivePartial } from "./util";
-import { closestSearchResult } from "./optimisation";
+import { closestSearchResult } from "./search";
 
 export interface GogResult {
     name: string;
