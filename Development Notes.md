@@ -161,3 +161,14 @@ Only steam matches "minimetro" to "mini metro". Not even giant bomb gets it.
 ---
 
 No site matches "devil may cry 1" to "devil may cry"
+
+---
+
+sample things to check:
+
+obra dinn       -> "return of the obra dinn"
+bioshock        -> bioshock remastered
+trine 4         -> trine 4 mare prince
+minimetro       -> mini metro
+devil may cry 1 -> devil may cry
+fear            -> FEAR
