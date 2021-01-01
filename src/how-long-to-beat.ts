@@ -1,8 +1,8 @@
 import * as cheerio from "cheerio";
 import fetch from "node-fetch";
-import * as levenshtein from "fastest-levenshtein";
+import { LCS } from "js-lcs";
 import * as querystring from "querystring";
-import { bug, minBy } from "./util";
+import { bug, maxBy } from "./util";
 
 export interface HowLongToBeatResult {
     name: string;
@@ -28,7 +28,7 @@ const fieldMap: Record<string, keyof HowLongToBeatResult["times"] | undefined> =
     "Solo": "solo",
     "Co-Op": "coop",
     "Vs.": "vs",
-} as const;
+};
 
 export async function getData(game: string): Promise<HowLongToBeatResult | undefined> {
     const searchPage = await getSearchPage(game);
@@ -39,11 +39,11 @@ export async function getData(game: string): Promise<HowLongToBeatResult | undef
     const searchResults = searchResultElems.toArray().map(searchPage);
 
     const gameLower = game.toLowerCase();
-    const bestResult = minBy(searchResults, searchResult => {
+    const bestResult = maxBy(searchResults, searchResult => {
         const nameElem = searchResult.find("a").first();
         const name = nameElem.text();
 
-        return levenshtein.distance(gameLower, name.toLowerCase());
+        return LCS.size(gameLower, name.toLowerCase());
     });
 
     if (!bestResult) return undefined;

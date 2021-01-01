@@ -1,8 +1,8 @@
 import * as cheerio from "cheerio";
 import fetch from "node-fetch";
-import * as levenshtein from "fastest-levenshtein";
+import { LCS } from "js-lcs";
 import * as querystring from "querystring";
-import { bug, minBy, nonNaN } from "./util";
+import { bug, maxBy, nonNaN } from "./util";
 
 type BothScores = Pick<MetacriticResult, "metascore" | "userscore">;
 
@@ -215,10 +215,10 @@ async function search(game: string): Promise<TargetGame | undefined> {
         .map(searchPage);
 
     const gameLower = game.toLowerCase();
-    const bestMatch = minBy(products, product => {
+    const bestMatch = maxBy(products, product => {
         const name = product.text().trim();
         if (!name) bug();
-        return levenshtein.distance(gameLower, name.toLowerCase());
+        return LCS.size(gameLower, name.toLowerCase());
     });
 
     if (!bestMatch) return undefined;

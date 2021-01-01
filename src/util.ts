@@ -38,22 +38,22 @@ export function escapeDoubleQuotes(s: string, replacement: string): string {
     return s.replace(allDoubleQuotes, replacement);
 }
 
-export function minBy<T>(arr: T[], toNum: (elem: T) => number): T | undefined {
+export function maxBy<T>(arr: T[], toNum: (elem: T) => number): T | undefined {
     if (arr.length === 0) return undefined;
 
-    let smallestNum = Infinity;
-    let smallest: T | undefined;
+    let biggestNum = -Infinity;
+    let biggest: T | undefined;
 
     for (const elem of arr) {
         const num = toNum(elem);
 
-        if (num < smallestNum) {
-            smallestNum = num;
-            smallest = elem;
+        if (num > biggestNum) {
+            biggestNum = num;
+            biggest = elem;
         }
     }
 
-    return smallest;
+    return biggest;
 }
 
 export function nonNaN<T>(num: number, fallback: T): number | T {

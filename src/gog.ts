@@ -1,8 +1,8 @@
 import * as cheerio from "cheerio";
 import fetch from "node-fetch";
-import * as levenshtein from "fastest-levenshtein";
+import { LCS } from "js-lcs";
 import * as querystring from "querystring";
-import { bug, minBy, nonNaN, RecursivePartial } from "./util";
+import { bug, maxBy, nonNaN, RecursivePartial } from "./util";
 
 export interface GogResult {
     name: string;
@@ -68,12 +68,12 @@ async function search(game: string): Promise<TargetGame | undefined> {
 
     // find best match
     const gameLower = game.toLowerCase();
-    const closest = minBy(searchData.products, product => {
+    const closest = maxBy(searchData.products, product => {
         if (!product) return bug();
         if (typeof product.title !== "string") bug();
         if (typeof product.url !== "string") bug();
 
-        return levenshtein.distance(gameLower, product.title.toLowerCase());
+        return LCS.size(gameLower, product.title.toLowerCase());
     });
 
     if (!closest) return undefined;

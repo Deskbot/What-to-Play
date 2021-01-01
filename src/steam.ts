@@ -1,9 +1,9 @@
 
 import * as cheerio from "cheerio";
 import fetch from "node-fetch";
-import * as levenshtein from "fastest-levenshtein";
+import { LCS } from "js-lcs";
 import * as querystring from "querystring";
-import { bug, minBy, nonNaN } from "./util";
+import { bug, maxBy, nonNaN } from "./util";
 
 export interface SteamResult {
     name: string;
@@ -93,9 +93,9 @@ async function searchGame(game: string): Promise<SteamSearchResult | undefined> 
     const matches = searchDom(".match").toArray();
 
     const gameLower = game.toLowerCase();
-    const bestMatch = minBy(matches, match => {
+    const bestMatch = maxBy(matches, match => {
         const name = searchDom(match).find(".match_name").text();
-        return levenshtein.distance(gameLower, name.toLowerCase());
+        return LCS.size(gameLower, name.toLowerCase());
     });
 
     if (!bestMatch) return undefined;
