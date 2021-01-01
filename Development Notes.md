@@ -153,3 +153,11 @@ Searching for "Demons Souls" on opencritic results in demons souls being the thi
 ---
 
 I will need to do more testing but Giant Bomb seems to have a decent search engine, and it could be used as the input to all the other websites, giving them an accurate title. But they restrict their API usage to 200/hour, which probably also applies to their main site? https://www.giantbomb.com/api/
+
+---
+
+Only steam matches "minimetro" to "mini metro". Not even giant bomb gets it.
+
+---
+
+No site matches "devil may cry 1" to "devil may cry"
