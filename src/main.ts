@@ -69,19 +69,28 @@ function main() {
 
         stdout.write("[");
 
-        input.on("line", async game => {
-            game = game.trim();
+        const lines = [] as Promise<void>[];
 
-            if (game.length === 0) return;
+        input.on("line", game => {
+            const writeResult = async () => {
+                game = game.trim();
 
-            lineCount += 1;
+                if (game.length === 0) return;
 
-            const obj = await resultToString(game, platforms)
-            stdout.write(obj);
-            stdout.write(",");
+                lineCount += 1;
+
+                const obj = await resultToString(game, platforms)
+                stdout.write(obj);
+                stdout.write(",");
+            };
+
+            lines.push(writeResult());
         });
 
-        input.on("close", () => {
+        input.on("close", async () => {
+            // ensure that the closing brace comes last
+            await Promise.all(lines);
+
             if (lineCount > 0) {
                 stdout.write("\b"); // remove the final trailing comma
             }
