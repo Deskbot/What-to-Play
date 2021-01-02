@@ -31,7 +31,7 @@ const platformMapping: ReadonlyMap<RegExp, MetacriticPlatform> = new Map([
     [/^(ps|playstation).*1?$/i, "playstation"],
     [/^(ps|playstation).*v(ita)?$/i, "playstation-vita"],
     [/^(ps|playstation).*(p|portable)$/i, "psp"],
-    [/^xbox.*s?e?(ries)?.*$/i, "xbox-series-x"],
+    [/^xbox.*series.*$/i, "xbox-series-x"],
     [/^xbox.*(one|1)$/i, "xbox-one"],
     [/^xbox.*360$/i, "xbox-360"],
     [/^xbox$/i, "xbox"],
