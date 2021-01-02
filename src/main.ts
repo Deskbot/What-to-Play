@@ -65,18 +65,16 @@ function main() {
 
     // json
     else {
-        let firstLine = true;
-
         stdout.write("[");
 
         const lines = [] as Promise<void>[];
+        let firstLine = true;
 
         input.on("line", game => {
+            game = game.trim();
+            if (game.length === 0) return;
+
             const writeResult = async () => {
-                game = game.trim();
-
-                if (game.length === 0) return;
-
                 const obj = await resultToString(game, platforms);
 
                 // should be a comma before each object except the first
@@ -97,7 +95,6 @@ function main() {
             stdout.write("]");
         });
     }
-
 }
 
 function printHelp() {
