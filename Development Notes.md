@@ -321,3 +321,6 @@ real    2m56.593s
 user    0m50.791s
 sys     0m1.970s
 
+---
+
+no open critic, it's search feature is too bad, and it's needed because the urls contain an "appid" specific to the website
