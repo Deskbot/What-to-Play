@@ -31,6 +31,22 @@ export function getPlatforms(): IterableIterator<MetacriticPlatform> {
     return platformMapping.values();
 }
 
+export class PlatformParseError extends Error {
+    constructor(input: unknown) {
+        const message = [
+            `Could not parse platform: "${input}"`,
+            "It should be similar to one of:",
+            ...getPlatforms()
+        ]
+        .join("\n");
+
+        super(message);
+    }
+}
+
+/**
+ * @throws PlatformParseError
+ */
 export function parsePlatforms(str: string): MetacriticPlatform[] {
     const result = [] as MetacriticPlatform[];
 
@@ -42,6 +58,8 @@ export function parsePlatforms(str: string): MetacriticPlatform[] {
         const maybePlatform = toPlatform(input);
         if (maybePlatform) {
             result.push(maybePlatform);
+        } else {
+            throw new PlatformParseError(input);
         }
     }
 
