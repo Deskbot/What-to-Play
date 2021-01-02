@@ -37,25 +37,26 @@ function main() {
     );
 
     // create the function that will get the data for the game
+    const country = validateCountry(args["c"] || args["country"] || "US");
     const givenPlatforms: string | undefined = args["p"] || args["platform"];
     const platforms = givenPlatforms
         ? parsePlatforms(givenPlatforms)
         : [...getPlatforms()];
 
-    const getGameDataForPlatforms = limitConcurrent(
+    const getGameData = limitConcurrent(
         5,
         csv
             ? getCsv
             : getJson
     );
 
-    const getGameData = (game: string) => getGameDataForPlatforms(game, platforms)
+    const getGameDataUsingConfig = (game: string) => getGameData(game, platforms, country)
 
     // generate and write out the result
     if (csv) {
-        writeCsv(input, getGameData);
+        writeCsv(input, getGameDataUsingConfig);
     } else {
-        writeJson(input, getGameData);
+        writeJson(input, getGameDataUsingConfig);
     }
 }
 
@@ -67,13 +68,24 @@ function printHelp() {
     console.log("Arguments:")
     console.log("-h | --help      : Print help.");
     console.log("--readme         : Print the readme.");
-    console.log("-p | --platforms : A comma separated list of platforms. When the score differs by platform, the best score is chosen (defaults to all platforms).");
-    console.log("--json           : Output in JSON format (defaults to CSV).");
+    console.log("-p | --platforms : A comma separated list of platforms. On Metacritic where the score differs by platform, the best score is chosen. (defaults to all platforms)");
+    console.log("-c | --country   : A 2-character country code, used by Steam to tailor results. (defaults to: US)");
+    console.log("--json           : Output in JSON format (instead of CSV).");
 }
 
 function printReadme() {
     fs.createReadStream(__dirname + "/../README.md")
         .pipe(process.stdout);
+}
+
+function validateCountry(country: string): string {
+    country = country.toUpperCase();
+    if (country.match(/^[A-Z]{2}$/)) {
+        return country;
+    }
+
+    console.error("Invalid country code given.");
+    process.exit(1);
 }
 
 function writeCsv(input: readline.Interface, getGameInfo: (game: string) => Promise<string>) {

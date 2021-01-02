@@ -74,10 +74,19 @@ function aggregateScore(
     return parseFloat(average(scores).toFixed(1));
 }
 
-export async function getCsv(game: string, platforms: MetacriticPlatform[]): Promise<string> {
+/**
+ * @param game Game to get data for
+ * @param platforms An array of platforms to consider Metacritic reviews for
+ * @param country 2-character country code defined by "ISO 3166-1 alpha-2", used by Steam
+ */
+export async function getCsv(
+    game: string,
+    platforms: MetacriticPlatform[],
+    country: string
+): Promise<string> {
     const buffer = [] as string[];
 
-    const data = await getData(game, platforms);
+    const data = await getData(game, platforms, country);
 
     const newData: Record<CsvHeaders, string | number | undefined> = {
         "Game": data.game,
@@ -111,17 +120,26 @@ export async function getCsv(game: string, platforms: MetacriticPlatform[]): Pro
     return buffer.join(",");
 }
 
-export async function getData(game: string, platforms: MetacriticPlatform[]): Promise<AllData> {
+/**
+ * @param game Game to get data for
+ * @param platforms An array of platforms to consider Metacritic reviews for
+ * @param country 2-character country code defined by "ISO 3166-1 alpha-2", used by Steam
+ */
+export async function getData(
+    game: string,
+    platforms: MetacriticPlatform[],
+    country: string
+): Promise<AllData> {
     const handleError = (err: any, website: string) => {
         console.error(`Error: code failure, when getting "${game}" from ${website}`);
         console.error(err);
         return undefined;
     }
 
-    const gogDataProm = gog.getData(game)                         .catch(err => handleError(err, "GOG"));
+    const gogDataProm =        gog.getData(game)                  .catch(err => handleError(err, "GOG"));
     const metacriticDataProm = metacritic.getData(game, platforms).catch(err => handleError(err, "Metacritic"));
-    const steamDataProm = steam.getData(game)                     .catch(err => handleError(err, "Steam"));
-    const hltbDataProm = hltb.getData(game)                       .catch(err => handleError(err, "How Long to Beat"));
+    const steamDataProm =      steam.getData(game)                .catch(err => handleError(err, "Steam"));
+    const hltbDataProm =       hltb.getData(game)                 .catch(err => handleError(err, "How Long to Beat"));
 
     // spawn all promises before blocking on their results
     const gogData = await gogDataProm;
@@ -138,8 +156,17 @@ export async function getData(game: string, platforms: MetacriticPlatform[]): Pr
     };
 }
 
-export async function getJson(game: string, platforms: MetacriticPlatform[]): Promise<string> {
-    return JSON.stringify(await getData(game, platforms));
+/**
+ * @param game Game to get data for
+ * @param platforms An array of platforms to consider Metacritic reviews for
+ * @param country 2-character country code defined by "ISO 3166-1 alpha-2", used by Steam
+ */
+export async function getJson(
+    game: string,
+    platforms: MetacriticPlatform[],
+    country: string,
+): Promise<string> {
+    return JSON.stringify(await getData(game, platforms, country));
 }
 
 /**

@@ -53,8 +53,9 @@ Format of file/stdin: new-line-separated list of game names
 Arguments:
 -h | --help      : Print help.
 --readme         : Print the readme.
--p | --platforms : A comma separated list of platforms. When the score differs by platform, the best score is chosen (defaults to all platforms).
---json           : Output in JSON format (defaults to CSV).
+-p | --platforms : A comma separated list of platforms. On Metacritic where the score differs by platform, the best score is chosen. (defaults to all platforms)
+-c | --country   : A 2-character country code, used by Steam to tailor results. (defaults to: US)
+--json           : Output in JSON format (instead of CSV).
 ```
 
 e.g. `what-to-play list_of_games.txt --json --platforms ps5,playstation4,switch,xbox series x,pc`
@@ -110,7 +111,7 @@ Metacritic Metascore   | 100     |       | Game Critic review scores put through
 Metacritic user score  |  10     |       | Presumably the mean user-submitted rating
 Steam rating           | 100     | %     | Percent of users who gave a positive review
 Aggregate score        | 100     |       | Mean of all other score fields, each normalised to be out of 100. Each score is weighted equally. If the score isn't present, it doesn't contribute to the average.
-How Long to Beat times |  ∞      | hours | Time
+How Long to Beat times |   ∞     | hours | Time
 
 ### Format Differences
 
