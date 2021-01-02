@@ -114,12 +114,6 @@ function getOtherPlatformUrls(page: cheerio.Root, platforms: MetacriticPlatform[
     return urls;
 }
 
-async function getScoresByUrl(scoreUrl: string): Promise<BothScores> {
-    const scorePageText = await fetch(scoreUrl).then(res => res.text());
-    const scorePage = cheerio.load(scorePageText);
-    return getScores(scorePage);
-}
-
 async function getScores(scorePage: cheerio.Root): Promise<BothScores> {
     const metascoreStr =
         scorePage(".product_scores")
@@ -142,6 +136,12 @@ async function getScores(scorePage: cheerio.Root): Promise<BothScores> {
         metascore: nonNaN(parseFloat(metascoreStr), undefined),
         userscore: nonNaN(parseFloat(userscoreStr), undefined),
     };
+}
+
+async function getScoresByUrl(scoreUrl: string): Promise<BothScores> {
+    const scorePageText = await fetch(scoreUrl).then(res => res.text());
+    const scorePage = cheerio.load(scorePageText);
+    return getScores(scorePage);
 }
 
 /** url looks like: /game/platform-name/game-name */
