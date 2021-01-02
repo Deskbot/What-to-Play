@@ -263,3 +263,11 @@ sys     0m1.970s
 ---
 
 no open critic, it's search feature is too bad, and it's needed because the urls contain an "appid" specific to the website
+
+---
+
+might not be a good idea to reject search results that have a large levenshtein due to how many games have "remastered edition" plastered on the end which is longer than the games actual title, or in the case of obra dinn, it's not known by its full title
+
+no single website has the best search engine there's advantages and disadvantages, so it's likely some columns will contain the wrong game, but the output tells you what game was found on the website and has links to the website, so you can check for yourself
+
+If there was a reliable search engine with all games and a good search engine, I would make that one decide what game to look at, but actually only metacritci and opencritic have everything and their search engines have big shortcomings;

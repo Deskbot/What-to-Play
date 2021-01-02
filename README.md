@@ -113,6 +113,14 @@ Steam rating           | 100     | %     | Percent of users who gave a positive 
 Aggregate score        | 100     |       | Mean of all other score fields, each normalised to be out of 100. Each score is weighted equally. If the score isn't present, it doesn't contribute to the average.
 How Long to Beat times |   ∞     | hours | Time
 
+The aggregate score exists so that there will be a score column filled in for every row for ease of sorting. However, doing this will skew games that exist on Steam further to the top because Steam's review system means it yields scores closer to 100.
+
+### Shortcomings
+
+Games with similar names could be confused for one another. An effort has been made to choose the best search result offered by each website, which is more accurate than taking the top result.
+
+The game found by each website is included in the output so you know whether the score displayed is for the game you're looking for.
+
 ### Format Differences
 
 The JSON output has fields for hyperlinks to where the data came from. In the CSV output, these urls are encoded as hyperlinks in the cell containing the related data.
