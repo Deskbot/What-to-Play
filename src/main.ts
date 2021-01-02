@@ -65,7 +65,7 @@ function main() {
 
     // json
     else {
-        let lineCount = 0;
+        let firstLine = true;
 
         stdout.write("[");
 
@@ -77,11 +77,15 @@ function main() {
 
                 if (game.length === 0) return;
 
-                lineCount += 1;
+                const obj = await resultToString(game, platforms);
 
-                const obj = await resultToString(game, platforms)
+                // should be a comma before each object except the first
+                if (!firstLine) {
+                    stdout.write(",");
+                    firstLine = false;
+                }
+
                 stdout.write(obj);
-                stdout.write(",");
             };
 
             lines.push(writeResult());
@@ -90,10 +94,6 @@ function main() {
         input.on("close", async () => {
             // ensure that the closing brace comes last
             await Promise.all(lines);
-
-            if (lineCount > 0) {
-                stdout.write("\b"); // remove the final trailing comma
-            }
             stdout.write("]");
         });
     }
