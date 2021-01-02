@@ -28,23 +28,6 @@ function main() {
 
     const csv = !args["json"]; // default to CSV
 
-    if (csv) {
-        console.log(csvHeaderRow);
-    }
-
-    // create the function that will get the data
-    const givenPlatforms: string | undefined = args["p"] || args["platform"];
-    const platforms = givenPlatforms
-        ? parsePlatforms(givenPlatforms)
-        : [...getPlatforms()];
-
-    const getGameInfo = limitConcurrent(
-        5,
-        csv
-            ? getCsv
-            : getJson
-    );
-
     // choose where to take the input from
     const file = args._[0] as string | undefined; // first arg
     const input = readline.createInterface(
@@ -53,47 +36,26 @@ function main() {
             : process.stdin
     );
 
-    // call the get info function on the input and pipe it to the output
+    // create the function that will get the data for the game
+    const givenPlatforms: string | undefined = args["p"] || args["platform"];
+    const platforms = givenPlatforms
+        ? parsePlatforms(givenPlatforms)
+        : [...getPlatforms()];
+
+    const getGameDataForPlatforms = limitConcurrent(
+        5,
+        csv
+            ? getCsv
+            : getJson
+    );
+
+    const getGameData = (game: string) => getGameDataForPlatforms(game, platforms)
+
+    // generate and write out the result
     if (csv) {
-        input.on("line", game => {
-            game = game.trim();
-
-            if (game.length === 0) return undefined;
-
-            getGameInfo(game, platforms).then(console.log);
-        });
-
+        writeCsv(input, getGameData);
     } else {
-        // json
-        stdout.write("[");
-
-        const lines = [] as Promise<void>[];
-        let firstLine = true;
-
-        input.on("line", game => {
-            game = game.trim();
-            if (game.length === 0) return;
-
-            const writeResult = async () => {
-                const obj = await getGameInfo(game, platforms);
-
-                // should be a comma before each object except the first
-                if (!firstLine) {
-                    stdout.write(",");
-                    firstLine = false;
-                }
-
-                stdout.write(obj);
-            };
-
-            lines.push(writeResult());
-        });
-
-        input.on("close", async () => {
-            // ensure that the closing brace comes last
-            await Promise.all(lines);
-            stdout.write("]");
-        });
+        writeJson(input, getGameData);
     }
 }
 
@@ -112,4 +74,50 @@ function printHelp() {
 function printReadme() {
     fs.createReadStream(__dirname + "/../README.md")
         .pipe(process.stdout);
+}
+
+function writeCsv(input: readline.Interface, getGameInfo: (game: string) => Promise<string>) {
+    // write headers
+    console.log(csvHeaderRow);
+
+    // write main rows
+    input.on("line", game => {
+        game = game.trim();
+        if (game.length === 0) return undefined;
+
+        getGameInfo(game).then(console.log);
+    });
+}
+
+function writeJson(input: readline.Interface, getGameInfo: (game: string) => Promise<string>) {
+    stdout.write("[");
+
+    const lines = [] as Promise<void>[];
+    let firstLine = true;
+
+    // write out one object at a time
+    input.on("line", game => {
+        game = game.trim();
+        if (game.length === 0) return;
+
+        const writeResult = async () => {
+            const obj = await getGameInfo(game);
+
+            // should be a comma before each object except the first
+            if (!firstLine) {
+                stdout.write(",");
+                firstLine = false;
+            }
+
+            stdout.write(obj);
+        };
+
+        lines.push(writeResult());
+    });
+
+    input.on("close", async () => {
+        // ensure that the closing brace comes last
+        await Promise.all(lines);
+        stdout.write("]");
+    });
 }
