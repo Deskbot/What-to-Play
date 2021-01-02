@@ -264,8 +264,8 @@ metacritic: matches "devil may cry 4" instead of "devil may cry 3: some subtitle
 
 after implementing LCS followed by Levenshtein
 
-@ fixable with making steam redirect dlc to the main game
+@@@@@@ fixable with making steam redirect dlc to the main game
 
 mega man x
-steam: @ gets 'Mega Man X Sound Collection' instead of 'Mega Man X Legacy Collection'
+steam: @@@@@@ gets 'Mega Man X Sound Collection' instead of 'Mega Man X Legacy Collection'
 
