@@ -1,29 +1,4 @@
-
-export type MetacriticPlatform =
-    "playstation-5"
-    | "playstation-4"
-    | "playstation-3"
-    | "playstation-2"
-    | "playstation"
-    | "playstation-vita"
-    | "psp"
-    | "xbox-series-x"
-    | "xbox-one"
-    | "xbox-360"
-    | "xbox"
-    | "pc"
-    | "switch"
-    | "wii-u"
-    | "wii"
-    | "gamecube"
-    | "nintendo-64"
-    | "3ds"
-    | "ds"
-    | "game-boy-advance"
-    | "ios"
-    | "dreamcast";
-
-const platformMapping: ReadonlyMap<RegExp, MetacriticPlatform> = new Map([
+const mappingInput = [
     [/^(ps|playstation).*5$/i, "playstation-5"],
     [/^(ps|playstation).*4$/i, "playstation-4"],
     [/^(ps|playstation).*3$/i, "playstation-3"],
@@ -46,7 +21,11 @@ const platformMapping: ReadonlyMap<RegExp, MetacriticPlatform> = new Map([
     [/^(nintendo.*)?(game.*boy.*advance|gba)$/i, "game-boy-advance"],
     [/^ios|android|mobile|(smart)?phone|tablet$/i, "ios"],
     [/^(sega.*)?dreamcast$/i, "dreamcast"],
-]);
+] as const;
+
+export type MetacriticPlatform = typeof mappingInput[number][1];
+
+const platformMapping: ReadonlyMap<RegExp, MetacriticPlatform> = new Map(mappingInput);
 
 export function getPlatforms(): IterableIterator<MetacriticPlatform> {
     return platformMapping.values();
