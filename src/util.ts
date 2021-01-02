@@ -38,6 +38,64 @@ export function escapeDoubleQuotes(s: string, replacement: string): string {
     return s.replace(allDoubleQuotes, replacement);
 }
 
+/**
+ * @param num Number of calls to the given function that can be spawned
+ *            (i.e. waiting to resolve) at once.
+ * @param func The function to limit
+ */
+export function limitConcurrent<A extends any[], R>(
+    num: number,
+    func: (...args: A) => Promise<R>,
+): (...args: A) => Promise<R> {
+    let concurrent = 0;
+    const waiting = [] as Array<() => Promise<void>>;
+
+    const call = (...args: A) => {
+        concurrent += 1;
+        const prom = func(...args);
+        prom.finally(() => {
+            concurrent -= 1;
+            next();
+        });
+        return prom;
+    };
+
+    const next = () => {
+        if (concurrent < num) {
+            const nextFunc = waiting.shift();
+            if (nextFunc === undefined) return;
+            nextFunc();
+        }
+    };
+
+    const limitedFunc = (...args: A) => {
+
+        // call the function immediately
+        if (concurrent < num) {
+            return call(...args);
+        }
+
+        // delay calling the function
+
+        // return a promise that resolves when the actual promise resolves
+        // but put the function to spawn the actual promise in a queue
+        // instead of spawning it
+        return new Promise<R>((resolve, reject) => {
+            const funcForLater = async () => {
+                try {
+                    resolve(await call(...args));
+                } catch (err) {
+                    reject(err);
+                }
+            };
+
+            waiting.push(funcForLater);
+        });
+    };
+
+    return limitedFunc;
+}
+
 export function nonNaN<T>(num: number, fallback: T): number | T {
     if (Number.isNaN(num)) {
         return fallback;
@@ -56,36 +114,3 @@ export type RecursivePartial<T> = {
         ? RecursivePartial<U>[]
         : RecursivePartial<T[K]>
 };
-
-/**
- * Takes asynchronous functions and spawns them
- * only when the last function to be given has been spawned and resolved.
- * If a promise rejects, no further functions are called.
- */
-export class Sequence {
-    private currentCommand: Promise<void> | undefined;
-    private commands = [] as Array<() => Promise<void>>;
-
-    andThen(asyncCommand: () => Promise<void>) {
-        if (this.currentCommand === undefined) {
-            this.schedule(asyncCommand);
-        } else {
-            this.commands.push(asyncCommand);
-        }
-    }
-
-    private schedule(asyncCommand: () => Promise<void>) {
-        this.currentCommand = asyncCommand();
-
-        // when the current command is done, start the next one
-        this.currentCommand.then(() => {
-            const nextCommand = this.commands.shift();
-
-            if (nextCommand === undefined) {
-                this.currentCommand = undefined;
-            } else {
-                this.schedule(nextCommand);
-            }
-        });
-    }
-}

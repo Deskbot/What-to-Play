@@ -4,7 +4,7 @@ import * as minimist from "minimist";
 import * as process from "process";
 import * as readline from "readline";
 import { csvHeaderRow, getCsv, getJson } from "./output";
-import { Sequence } from "./util";
+import { limitConcurrent } from "./util";
 import { getPlatforms, parsePlatforms } from "./platform";
 
 try {
@@ -37,19 +37,18 @@ function main() {
         ? parsePlatforms(givenPlatforms)
         : [...getPlatforms()];
 
-    const resultToString = csv
-        ? getCsv
-        : getJson;
+    const resultToString = limitConcurrent(
+        5,
+        csv
+            ? getCsv
+            : getJson
+    );
 
-    const sync = new Sequence();
     const print = (game: string) => {
         game = game.trim();
 
         if (game.length > 0) {
-            sync.andThen(async () => {
-                const str = await resultToString(game, platforms);
-                console.log(str);
-            });
+            resultToString(game, platforms).then(console.log);
         }
     }
 

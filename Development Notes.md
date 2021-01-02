@@ -269,3 +269,55 @@ after implementing LCS followed by Levenshtein
 mega man x
 steam: @@@@@@ gets 'Mega Man X Sound Collection' instead of 'Mega Man X Legacy Collection'
 
+---
+
+original rate limit code (10 every 20 s)
+
+real    9m32.632s
+user    2m47.898s
+sys     0m3.124s
+
+sequential
+
+about 6min 30s?
+
+max concurrent 2
+
+real    3m15.412s
+user    0m52.083s
+sys     0m1.985s
+
+max concurrent 3
+
+real    2m29.719s
+user    0m51.939s
+sys     0m2.123s
+
+max concurrent 4
+
+real    2m39.156s
+user    0m50.329s
+sys     0m2.231s
+
+// are the websites rate-limiting me? :O
+
+max concurrent 5
+
+real    2m20.290s
+user    0m49.617s
+sys     0m2.098s
+
+max concurrent 6
+
+real    2m21.036s
+user    0m50.178s
+sys     0m1.948s
+
+max concurrent 7
+
+metacritic failed with timeout
+
+real    2m56.593s
+user    0m50.791s
+sys     0m1.970s
+
