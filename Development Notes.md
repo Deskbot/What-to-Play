@@ -6,72 +6,7 @@ This is probably a quicker way of getting data because Steam probably queries le
 
 ---
 
-Metacritic platform number (data-mcadvval)
-Matacritic platform name
-
-72496
-PlayStation 4
-
-1
-PlayStation 3
-
-80000
-Xbox One
-
-2
-Xbox 360
-
-3
-PC
-
-4
-DS
-
-16
-3DS
-
-67365
-PlayStation Vita
-
-7
-PSP
-
-8
-Wii
-
-68410
-Wii U
-
-268409
-Switch
-
-6
-PlayStation 2
-
-10
-PlayStation
-
-11
-Game Boy Advance
-
-9
-iPhone/iPad
-
-12
-Xbox
-
-13
-GameCube
-
-14
-Nintendo 64
-
-15
-Dreamcast
-
----
-
-Metacritic score locations
+Metacritic score locations on review page
 
 .product_scores
     .main_details
@@ -117,6 +52,8 @@ The score that GOG shows in the search menu is sometimes missing (0) when there 
 
 In the case of Cyberpunk 2077, the search menu shows 5 stars but the product page shows <4 stars.
 
+That's why I'm getting the score out of the product page and not the search results.
+
 ---
 
 How long to beat doesn't have very helpful classes where it displays the timings in the search results.
@@ -145,6 +82,8 @@ steam search dropdown and steam search page show completely different results
 e.g. search for "the messenger", dropdown : 1st, search page 4th
 
 or better yet try searching for "dark sou", doesn't appear in search page but does with drop down
+
+The drop down results are much better, so I'm using those.
 
 ---
 
