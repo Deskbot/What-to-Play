@@ -44,25 +44,21 @@ function main() {
             : getJson
     );
 
-    const print = (game: string) => {
+    const file = args._[0] as string | undefined; // first arg
+
+    const input = readline.createInterface(
+        file
+            ? fs.createReadStream(file)
+            : process.stdin
+    );
+
+    input.on("line", game => {
         game = game.trim();
 
         if (game.length > 0) {
             resultToString(game, platforms).then(console.log);
         }
-    }
-
-    const file = args._[0] as string | undefined; // first arg
-
-    if (file) {
-        fs.readFileSync(file)
-            .toString()
-            .split("\n")
-            .forEach(print);
-    } else {
-        readline.createInterface(process.stdin)
-            .on("line", print);
-    }
+    });
 }
 
 function printHelp() {
