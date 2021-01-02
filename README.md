@@ -43,25 +43,6 @@ npm run build
 
 ## Command Line Usage
 
-### Arguments
-
-```
-Usage: command (file name)? (argument)*
-
-Format of file/stdin: new-line-separated list of game names
-
-Arguments:
--h | --help      : Print help.
---readme         : Print the readme.
--p | --platforms : A comma separated list of platforms. On Metacritic where the score differs by platform, the best score is chosen. (defaults to all platforms)
--c | --country   : A 2-character country code, used by Steam to tailor results. (defaults to: US)
---json           : Output in JSON format (instead of CSV).
-```
-
-e.g. `what-to-play list_of_games.txt --json --platforms ps5,playstation4,switch,xbox series x,pc`
-
-Platform strings are parsed forgivingly.
-
 ### Command
 
 Global:
@@ -81,6 +62,25 @@ From repository:
 ```
 npm run main -- ...
 ```
+
+### Arguments
+
+```
+Usage: command (file name)? (argument)*
+
+Format of file/stdin: new-line-separated list of game names
+
+Arguments:
+-h | --help      : Print help.
+--readme         : Print the readme.
+-p | --platforms : A comma separated list of platforms. On Metacritic where the score differs by platform, the best score is chosen. (defaults to all platforms)
+-c | --country   : A 2-character country code, used by Steam to tailor results. (defaults to: US)
+--json           : Output in JSON format (instead of CSV).
+```
+
+e.g. `what-to-play list_of_games.txt --json --platforms ps5,playstation4,switch,xbox series x,pc`
+
+Platform strings are parsed forgivingly.
 
 ## Library Usage
 
