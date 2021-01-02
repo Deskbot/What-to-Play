@@ -32,7 +32,7 @@ function main() {
         console.log(csvHeaderRow);
     }
 
-    const givenPlatforms: string | undefined = args["-p"] || args["--platform"];
+    const givenPlatforms: string | undefined = args["p"] || args["platform"];
     const platforms = givenPlatforms
         ? parsePlatforms(givenPlatforms)
         : [...getPlatforms()];
