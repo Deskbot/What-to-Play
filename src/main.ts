@@ -26,45 +26,45 @@ function main() {
         return printReadme();
     }
 
-    // default to CSV
-    const csv = !args["json"];
+    const csv = !args["json"]; // default to CSV
 
     if (csv) {
         console.log(csvHeaderRow);
     }
 
+    // create the function that will get the data
     const givenPlatforms: string | undefined = args["p"] || args["platform"];
     const platforms = givenPlatforms
         ? parsePlatforms(givenPlatforms)
         : [...getPlatforms()];
 
-    const resultToString = limitConcurrent(
+    const getGameInfo = limitConcurrent(
         5,
         csv
             ? getCsv
             : getJson
     );
 
+    // choose where to take the input from
     const file = args._[0] as string | undefined; // first arg
-
     const input = readline.createInterface(
         file
             ? fs.createReadStream(file)
             : process.stdin
     );
 
+    // call the get info function on the input and pipe it to the output
     if (csv) {
         input.on("line", game => {
             game = game.trim();
 
             if (game.length === 0) return undefined;
 
-            resultToString(game, platforms).then(console.log);
+            getGameInfo(game, platforms).then(console.log);
         });
-    }
 
-    // json
-    else {
+    } else {
+        // json
         stdout.write("[");
 
         const lines = [] as Promise<void>[];
@@ -75,7 +75,7 @@ function main() {
             if (game.length === 0) return;
 
             const writeResult = async () => {
-                const obj = await resultToString(game, platforms);
+                const obj = await getGameInfo(game, platforms);
 
                 // should be a comma before each object except the first
                 if (!firstLine) {
