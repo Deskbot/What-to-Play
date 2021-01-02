@@ -84,11 +84,11 @@ npm run main -- ...
 
 ## Library Usage
 
-See [src/api.ts] for what exactly is available.
+See `src/api.ts` for what exactly is available.
 
-The main functions to look at are in [src/output.ts]. Functions for getting a subset of the output data are exposed under namespaces in [src/api.ts].
+The main functions to look at are in `src/output.ts`. Functions for getting a subset of the output data are exposed under namespaces in `src/api.ts`.
 
-In terms of API stability. You can trust exports from [src/output.ts] to be less likely to change than other exports, but I'll try to keep to semantic versioning.
+In terms of API stability. You can trust exports from `src/output.ts` to be less likely to change than other exports, but I'll try to keep to semantic versioning.
 
 ## Output
 
