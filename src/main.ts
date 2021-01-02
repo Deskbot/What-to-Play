@@ -6,6 +6,7 @@ import * as readline from "readline";
 import { csvHeaderRow, getCsv, getJson } from "./output";
 import { limitConcurrent } from "./util";
 import { getPlatforms, parsePlatforms } from "./platform";
+import { stdout } from "process";
 
 try {
     main();
@@ -52,13 +53,42 @@ function main() {
             : process.stdin
     );
 
-    input.on("line", game => {
-        game = game.trim();
+    if (csv) {
+        input.on("line", game => {
+            game = game.trim();
 
-        if (game.length > 0) {
+            if (game.length === 0) return undefined;
+
             resultToString(game, platforms).then(console.log);
-        }
-    });
+        });
+    }
+
+    // json
+    else {
+        let lineCount = 0;
+
+        stdout.write("[");
+
+        input.on("line", async game => {
+            game = game.trim();
+
+            if (game.length === 0) return;
+
+            lineCount += 1;
+
+            const obj = await resultToString(game, platforms)
+            stdout.write(obj);
+            stdout.write(",");
+        });
+
+        input.on("close", () => {
+            if (lineCount > 0) {
+                stdout.write("\b"); // remove the final trailing comma
+            }
+            stdout.write("]");
+        });
+    }
+
 }
 
 function printHelp() {
