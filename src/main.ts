@@ -4,7 +4,6 @@ import * as metacritic from "./metacritic";
 import * as minimist from "minimist";
 import * as process from "process";
 import * as readline from "readline";
-import { MetacriticPlatform } from "./metacritic";
 import { csvHeaderRow, getCsv, getJson } from "./output";
 import { Sequence } from "./util";
 
@@ -35,8 +34,8 @@ function main() {
 
     const givenPlatforms: string | undefined = args["-p"] || args["--platform"];
     const platforms = givenPlatforms
-        ? parsePlatforms(givenPlatforms)
-        : [...metacritic.platforms.values()];
+        ? metacritic.parsePlatforms(givenPlatforms)
+        : [...metacritic.getPlatforms()];
 
     const resultToString = csv
         ? getCsv
@@ -65,23 +64,6 @@ function main() {
         readline.createInterface(process.stdin)
             .on("line", print);
     }
-}
-
-function parsePlatforms(str: string): MetacriticPlatform[] {
-    const result = [] as MetacriticPlatform[];
-
-    for (let input of str.split(",")) {
-        input = input.trim();
-
-        if (input.length === 0) continue;
-
-        const maybePlatform = metacritic.toPlatform(input);
-        if (maybePlatform) {
-            result.push(maybePlatform);
-        }
-    }
-
-    return result;
 }
 
 function printHelp() {
