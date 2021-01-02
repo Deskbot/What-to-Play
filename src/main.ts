@@ -1,11 +1,11 @@
 
 import * as fs from "fs";
-import * as metacritic from "./metacritic";
 import * as minimist from "minimist";
 import * as process from "process";
 import * as readline from "readline";
 import { csvHeaderRow, getCsv, getJson } from "./output";
 import { Sequence } from "./util";
+import { getPlatforms, parsePlatforms } from "./platform";
 
 try {
     main();
@@ -34,8 +34,8 @@ function main() {
 
     const givenPlatforms: string | undefined = args["-p"] || args["--platform"];
     const platforms = givenPlatforms
-        ? metacritic.parsePlatforms(givenPlatforms)
-        : [...metacritic.getPlatforms()];
+        ? parsePlatforms(givenPlatforms)
+        : [...getPlatforms()];
 
     const resultToString = csv
         ? getCsv

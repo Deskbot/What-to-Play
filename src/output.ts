@@ -1,8 +1,8 @@
 import * as gog from "./gog";
 import * as hltb from "./how-long-to-beat";
 import * as metacritic from "./metacritic";
+import { MetacriticPlatform } from "./platform";
 import * as steam from "./steam";
-import { MetacriticPlatform } from "./metacritic";
 import { average, bindUndefined, csvFriendly, escapeDoubleQuotes, printable } from "./util";
 
 export interface AllData {
