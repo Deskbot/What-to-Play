@@ -17,12 +17,12 @@ export interface AllData {
 export const csvHeaders = [
     "Game",
     "Aggregate Score",
-    "Steam Name",
-    "Steam All Time % Positive",
-    "Steam Recent % Positive",
     "Metacritic Name",
     "Metacritic Critic Score",
     "Metacritic User Score",
+    "Steam Name",
+    "Steam All Time % Positive",
+    "Steam Recent % Positive",
     "GOG Name",
     "GOG Score",
     "How Long to Beat Name",
@@ -82,9 +82,6 @@ export async function getCsv(game: string, platforms: MetacriticPlatform[]): Pro
     const newData: Record<CsvHeaders, string | number | undefined> = {
         "Game": data.game,
         "Aggregate Score": data.aggregateScore,
-        "Steam Name": bindUndefined(data.steam, s => toHyperlink(s.url, s.name)),
-        "Steam All Time % Positive": data.steam?.allTimeScore,
-        "Steam Recent % Positive": data.steam?.recentScore,
         "Metacritic Name": bindUndefined(data.metacritic, m => toHyperlink(m.url, m.name)),
         "Metacritic Critic Score": data.metacritic?.metascore
             ? toHyperlink(data.metacritic.metascoreUrl!, data.metacritic.metascore)
@@ -92,6 +89,9 @@ export async function getCsv(game: string, platforms: MetacriticPlatform[]): Pro
         "Metacritic User Score": data.metacritic?.userscore
             ? toHyperlink(data.metacritic.userscoreUrl!, data.metacritic.userscore)
             : undefined,
+        "Steam Name": bindUndefined(data.steam, s => toHyperlink(s.url, s.name)),
+        "Steam All Time % Positive": data.steam?.allTimeScore,
+        "Steam Recent % Positive": data.steam?.recentScore,
         "GOG Name": bindUndefined(data.gog, g => toHyperlink(g.url, g.name)),
         "GOG Score": data.gog?.score,
         "How Long to Beat Name": bindUndefined(data.hltb, h => toHyperlink(h.url, h.name)),
