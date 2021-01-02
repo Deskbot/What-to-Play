@@ -127,6 +127,10 @@ The JSON output has fields for hyperlinks to where the data came from. In the CS
 
 The hyperlinks are encoded as `=HYPERLINK("url","label")`, which is a valid formula with the same behaviour across Libre Office Calc, Google Sheets, and Microsoft Office Excel, and probably several others.
 
+## Rate Limiting
+
+Your requests are rate limited to prevent the websites rejecting you and causing a timeout.
+
 ## Privacy
 
 Be aware that by running the software, you may be subject to aspects of the privacy policies of the websites visited. The websites that could be visited are listed above.
