@@ -84,7 +84,7 @@ function validateCountry(country: string): string {
         return country;
     }
 
-    console.error("Invalid country code given.");
+    console.error("Invalid country code given. A two-character country code was required.");
     process.exit(1);
 }
 

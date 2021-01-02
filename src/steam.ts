@@ -17,8 +17,11 @@ interface SteamSearchResult {
     url: string;
 }
 
-export async function getData(game: string): Promise<SteamResult | undefined> {
-    const productData = await searchGame(game);
+/**
+ * @param country 2-character country code defined by "ISO 3166-1 alpha-2"
+ */
+export async function getData(game: string, country: string): Promise<SteamResult | undefined> {
+    const productData = await searchGame(game, country);
     if (productData === undefined) return undefined;
 
     const { name, url } = productData;
@@ -83,9 +86,9 @@ function reviewRowToPercent(r: any): number | undefined {
     return nonNaN(parseInt(recentReviewPercentStr), undefined);
 }
 
-async function searchGame(game: string): Promise<SteamSearchResult | undefined> {
+async function searchGame(game: string, country: string): Promise<SteamSearchResult | undefined> {
     const gameStr = querystring.escape(game);
-    const searchUrl = `https://store.steampowered.com/search/suggest?f=games&cc=US&term=${gameStr}`;
+    const searchUrl = `https://store.steampowered.com/search/suggest?f=games&cc=${country}&term=${gameStr}`;
     const searchDropdownHTML = await getSteamPage(searchUrl);
 
     const searchDom = cheerio.load(searchDropdownHTML);

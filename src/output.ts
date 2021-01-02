@@ -82,7 +82,7 @@ function aggregateScore(
 export async function getCsv(
     game: string,
     platforms: MetacriticPlatform[],
-    country: string
+    country: string,
 ): Promise<string> {
     const buffer = [] as string[];
 
@@ -128,7 +128,7 @@ export async function getCsv(
 export async function getData(
     game: string,
     platforms: MetacriticPlatform[],
-    country: string
+    country: string,
 ): Promise<AllData> {
     const handleError = (err: any, website: string) => {
         console.error(`Error: code failure, when getting "${game}" from ${website}`);
@@ -138,7 +138,7 @@ export async function getData(
 
     const gogDataProm =        gog.getData(game)                  .catch(err => handleError(err, "GOG"));
     const metacriticDataProm = metacritic.getData(game, platforms).catch(err => handleError(err, "Metacritic"));
-    const steamDataProm =      steam.getData(game)                .catch(err => handleError(err, "Steam"));
+    const steamDataProm =      steam.getData(game, country)   .catch(err => handleError(err, "Steam"));
     const hltbDataProm =       hltb.getData(game)                 .catch(err => handleError(err, "How Long to Beat"));
 
     // spawn all promises before blocking on their results
