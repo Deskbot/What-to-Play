@@ -1,5 +1,5 @@
 import * as gog from "./gog";
-import * as hltb from "./how-long-to-beat";
+import * as hltb from "./howlongtobeat";
 import * as metacritic from "./metacritic";
 import { MetacriticPlatform } from "./platform";
 import * as steam from "./steam";
