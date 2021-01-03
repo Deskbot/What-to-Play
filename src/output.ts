@@ -138,7 +138,7 @@ export async function getData(
 
     const gogDataProm =        gog.getData(game)                  .catch(err => handleError(err, "GOG"));
     const metacriticDataProm = metacritic.getData(game, platforms).catch(err => handleError(err, "Metacritic"));
-    const steamDataProm =      steam.getData(game, country)   .catch(err => handleError(err, "Steam"));
+    const steamDataProm =      steam.getData(game, country)       .catch(err => handleError(err, "Steam"));
     const hltbDataProm =       hltb.getData(game)                 .catch(err => handleError(err, "How Long to Beat"));
 
     // spawn all promises before blocking on their results
