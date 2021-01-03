@@ -38,7 +38,7 @@ export const csvHeaderRow = csvHeaders.join(",");
 
 export type CsvHeaders = typeof csvHeaders[number];
 
-function aggregateScore(
+export function aggregateScore(
     gogData?: gog.GogResult,
     metacriticData?: metacritic.MetacriticResult,
     steamResult?: steam.SteamResult,
