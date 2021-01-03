@@ -1,9 +1,10 @@
 import * as gog from "./gog";
 import * as hltb from "./howlongtobeat";
 import * as metacritic from "./metacritic";
-import { MetacriticPlatform } from "./platform";
 import * as steam from "./steam";
-import { average, bindUndefined, csvFriendly, escapeDoubleQuotes, printable } from "./util";
+import { MetacriticPlatform } from "./platform";
+import { toHyperlink } from "./spreadsheet";
+import { average, bindUndefined, csvFriendly, printable } from "./util";
 
 export interface AllData {
     game: string;
@@ -167,18 +168,4 @@ export async function getJson(
     country: string,
 ): Promise<string> {
     return JSON.stringify(await getData(game, platforms, country));
-}
-
-/**
- * Based on common spreadsheet syntax.
- */
-function toHyperlink(url: string, text: string | number): string {
-    // escape inputs to fit formula syntax
-    url = escapeDoubleQuotes(url, '""');
-
-    if (typeof text === "string") {
-        text = escapeDoubleQuotes(text, '""');
-    }
-
-    return `=HYPERLINK("${url}", "${text}")`;
 }
