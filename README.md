@@ -66,15 +66,17 @@ npm run main -- ...
 ### Arguments
 
 ```
-Usage: command (file name)? (argument)*
+Usage: command (file path)? (arguments)*
 
-Format of file/stdin: new-line-separated list of game names
+If a file is given, the file will be used as input, otherwise stdin is used.
+
+Input format: game titles on separate lines
 
 Arguments:
 -h | --help      : Print help.
 --readme         : Print the readme.
--p | --platforms : A comma separated list of platforms. On Metacritic where the score differs by platform, the best score is chosen. (defaults to all platforms)
--c | --country   : A 2-character country code, used by Steam to tailor results. (defaults to: US)
+-p | --platforms : A comma separated list of platforms. On Metacritic where the score differs by platform, the best score is chosen. (default: all platforms)
+-c | --country   : A 2-character country code, used by Steam to tailor results. (default: US)
 --json           : Output in JSON format (instead of CSV).
 ```
 

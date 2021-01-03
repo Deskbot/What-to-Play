@@ -61,15 +61,17 @@ function main() {
 }
 
 function printHelp() {
-    console.log("Usage: command (file name)? (argument)*");
+    console.log("Usage: command (file path)? (arguments)*");
     console.log("");
-    console.log("Format of file/stdin: new-line-separated list of game names");
+    console.log("If a file is given, the file will be used as input, otherwise stdin is used.");
     console.log("");
-    console.log("Arguments:")
+    console.log("Input format: game titles on separate lines");
+    console.log("");
+    console.log("Arguments:");
     console.log("-h | --help      : Print help.");
     console.log("--readme         : Print the readme.");
     console.log("-p | --platforms : A comma separated list of platforms. On Metacritic where the score differs by platform, the best score is chosen. (defaults to all platforms)");
-    console.log("-c | --country   : A 2-character country code, used by Steam to tailor results. (defaults to: US)");
+    console.log("-c | --country   : A 2-character country code, used by Steam to tailor results. (defaults to US)");
     console.log("--json           : Output in JSON format (instead of CSV).");
 }
 
