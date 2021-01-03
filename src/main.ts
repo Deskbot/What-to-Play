@@ -1,4 +1,3 @@
-
 import * as fs from "fs";
 import * as minimist from "minimist";
 import * as process from "process";
