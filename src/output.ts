@@ -3,7 +3,7 @@ import * as hltb from "./howlongtobeat";
 import * as metacritic from "./metacritic";
 import * as steam from "./steam";
 import { MetacriticPlatform } from "./platform";
-import { getCellInCol, emptiable, toHyperlink } from "./spreadsheet";
+import { count, getCellInCol, toHyperlink } from "./spreadsheet";
 import { average, bindUndefined, csvFriendly, printable } from "./util";
 
 export interface AllData {
@@ -84,24 +84,33 @@ const aggregateScoreFormula = (function(): string {
     const steam_allTimeScore = csvHeaders.indexOf("Steam All Time % Positive") + 1;
     const steam_recentScore = csvHeaders.indexOf("Steam Recent % Positive") + 1;
 
-    const gog_score_cell = emptiable(getCellInCol(gog_score));
-    const metacritic_metascore_cell = emptiable(getCellInCol(metacritic_metascore));
-    const metacritic_userscore_cell = emptiable(getCellInCol(metacritic_userscore));
-    const steam_allTimeScore_cell = emptiable(getCellInCol(steam_allTimeScore));
-    const steam_recentScore_cell = emptiable(getCellInCol(steam_recentScore));
+    const gog_score_cell = getCellInCol(gog_score);
+    const metacritic_metascore_cell = getCellInCol(metacritic_metascore);
+    const metacritic_userscore_cell = getCellInCol(metacritic_userscore);
+    const steam_allTimeScore_cell = getCellInCol(steam_allTimeScore);
+    const steam_recentScore_cell = getCellInCol(steam_recentScore);
 
-    // normalise the scores to be out of 100
-
-    const scoreFormulae = [
-        `${gog_score_cell} * 20`,
+    const cells = [
+        gog_score_cell,
         metacritic_metascore_cell,
-        `${metacritic_userscore_cell} * 10`,
+        metacritic_userscore_cell,
         steam_allTimeScore_cell,
         steam_recentScore_cell,
     ];
 
-    // average the scores, blank cells don't contribute to the average
-    return "=AVERAGE(" + scoreFormulae.join(", ") + ")";
+    // normalise the scores to be out of 100
+    const scoreExpressions = [
+        `(${gog_score_cell} * 20)`,
+        `(${metacritic_metascore_cell})`,
+        `(${metacritic_userscore_cell} * 10)`,
+        `(${steam_allTimeScore_cell})`,
+        `(${steam_recentScore_cell})`,
+    ];
+
+    // average the scores, ensure blank cells don't contribute to the average
+    const average = `(${scoreExpressions.join(" + ")}) / ${count(cells)}`;
+
+    return `=IFERROR(${average}, "")`;
 })();
 
 /**
