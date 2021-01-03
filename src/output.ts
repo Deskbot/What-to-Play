@@ -3,7 +3,7 @@ import * as hltb from "./howlongtobeat";
 import * as metacritic from "./metacritic";
 import * as steam from "./steam";
 import { MetacriticPlatform } from "./platform";
-import { toHyperlink } from "./spreadsheet";
+import { getCellInCol, emptiable, toHyperlink } from "./spreadsheet";
 import { average, bindUndefined, csvFriendly, printable } from "./util";
 
 export interface AllData {
@@ -75,6 +75,35 @@ function aggregateScore(
     return parseFloat(average(scores).toFixed(1));
 }
 
+const aggregateScoreFormula = (function(): string {
+    // get cell references
+
+    const gog_score = csvHeaders.indexOf("GOG Score") + 1;
+    const metacritic_metascore = csvHeaders.indexOf("Metacritic Critic Score") + 1;
+    const metacritic_userscore = csvHeaders.indexOf("Metacritic User Score") + 1;
+    const steam_allTimeScore = csvHeaders.indexOf("Steam All Time % Positive") + 1;
+    const steam_recentScore = csvHeaders.indexOf("Steam Recent % Positive") + 1;
+
+    const gog_score_cell = emptiable(getCellInCol(gog_score));
+    const metacritic_metascore_cell = emptiable(getCellInCol(metacritic_metascore));
+    const metacritic_userscore_cell = emptiable(getCellInCol(metacritic_userscore));
+    const steam_allTimeScore_cell = emptiable(getCellInCol(steam_allTimeScore));
+    const steam_recentScore_cell = emptiable(getCellInCol(steam_recentScore));
+
+    // normalise the scores to be out of 100
+
+    const scoreFormulae = [
+        `${gog_score_cell} * 20`,
+        metacritic_metascore_cell,
+        `${metacritic_userscore_cell} * 10`,
+        steam_allTimeScore_cell,
+        steam_recentScore_cell,
+    ];
+
+    // average the scores, blank cells don't contribute to the average
+    return "=AVERAGE(" + scoreFormulae.join(", ") + ")";
+})();
+
 /**
  * @param game Game to get data for
  * @param platforms An array of platforms to consider Metacritic reviews for
@@ -91,7 +120,7 @@ export async function getCsv(
 
     const newData: Record<CsvHeaders, string | number | undefined> = {
         "Game": data.game,
-        "Aggregate Score": data.aggregateScore,
+        "Aggregate Score": aggregateScoreFormula,
         "Metacritic Name": bindUndefined(data.metacritic, m => toHyperlink(m.url, m.name)),
         "Metacritic Critic Score": data.metacritic?.metascore
             ? toHyperlink(data.metacritic.metascoreUrl!, data.metacritic.metascore)
