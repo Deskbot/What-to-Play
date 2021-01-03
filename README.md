@@ -33,10 +33,11 @@ As a dependency:
 npm install what-to-play
 ```
 
-Quick and dirty download:
+Download without installing:
 
 ```
 git clone https://github.com/Deskbot/What-to-Play --depth 1
+cd What-to-Play
 npm install
 npm run build
 ```
