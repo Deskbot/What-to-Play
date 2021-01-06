@@ -10,6 +10,7 @@ export interface SteamResult {
     recentScore?: number;
     allTimeScore?: number;
     url: string;
+    releaseDate: string;
 }
 
 interface SteamSearchResult {
@@ -51,11 +52,14 @@ export async function getData(game: string, country: string): Promise<SteamResul
         allTimeScore = reviewRowToPercent(reviewInfos.get(1));
     }
 
+    const releaseDate = storePage(storePage(".release_date .date").get(0)).text();
+
     return {
         name,
         recentScore,
         allTimeScore,
         url,
+        releaseDate,
     };
 }
 
@@ -75,7 +79,6 @@ function reviewRowToPercent(r: any): number | undefined {
     }
 
     const row = r as cheerio.TagElement;
-
     const recentReviewText = row.attribs["data-tooltip-html"];
 
     // the percent is at the start and consists of up to 3 characters followed by a % sign
