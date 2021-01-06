@@ -39,11 +39,12 @@ function main() {
     const country = validateCountry(args["c"] || args["country"] || "US");
     const givenPlatforms: string | undefined = args["p"] || args["platform"];
     const platforms = givenPlatforms
-        ? parsePlatforms(givenPlatforms)
-        : [...getPlatforms()];
+    ? parsePlatforms(givenPlatforms)
+    : [...getPlatforms()];
 
+    const rateLimit = parseInt(args["rate-limit"]) || 5;
     const getGameData = limitConcurrent(
-        5,
+        rateLimit,
         csv
             ? getCsv
             : getJson
@@ -69,9 +70,10 @@ function printHelp() {
     console.log("Arguments:");
     console.log("-h | --help      : Print help.");
     console.log("--readme         : Print the readme.");
-    console.log("-p | --platforms : A comma separated list of platforms. On Metacritic where the score differs by platform, the best score is chosen. (defaults to all platforms)");
-    console.log("-c | --country   : A 2-character country code, used by Steam to tailor results. (defaults to US)");
+    console.log("-p | --platforms : A comma separated list of platforms. On Metacritic where the score differs by platform, the best score is chosen. (default: all platforms)");
+    console.log("-c | --country   : A 2-character country code, used by Steam to tailor results. (default: US)");
     console.log("--json           : Output in JSON format (instead of CSV).");
+    console.log("--rate-limit     : Set the maximum number of games that can be queried simultaneously. If set too high, queries will be rejected by the websites queried. (default: 5)");
 }
 
 function printReadme() {

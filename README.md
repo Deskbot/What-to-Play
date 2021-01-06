@@ -79,6 +79,7 @@ Arguments:
 -p | --platforms : A comma separated list of platforms. On Metacritic where the score differs by platform, the best score is chosen. (default: all platforms)
 -c | --country   : A 2-character country code, used by Steam to tailor results. (default: US)
 --json           : Output in JSON format (instead of CSV).
+--rate-limit     : Set the maximum number of games that can be queried simultaneously. If set too high, queries will be rejected by the websites queried. (defaults to 5)
 ```
 
 e.g. `what-to-play list_of_games.txt --json --platforms ps5,playstation4,switch,xbox series x,pc`
