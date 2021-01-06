@@ -119,6 +119,10 @@ How Long to Beat times |   ∞     | hours | Time
 
 The aggregate score exists so that there will be a score column filled in for every row for ease of sorting. However, doing this will skew games that exist on Steam further to the top because Steam's review system means it yields scores closer to 100.
 
+### Release Dates
+
+These will vary by release platform. The data provided is to give a rough idea. These dates aren't straightforward to sort because the dates themselves have no consistent format. Sometimes a long time period is specified instead of a specific date.
+
 ### Shortcomings
 
 Games with similar names could be confused for one another. An effort has been made to choose the best search result offered by each website, which is more accurate than taking the top result.
