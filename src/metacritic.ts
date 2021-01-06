@@ -20,6 +20,8 @@ export interface MetacriticResult {
      */
     userscore?: number;
 
+    releaseDate: string;
+
     metascoreUrl?: string;
     userscoreUrl?: string;
 }
@@ -83,11 +85,14 @@ export async function getData(game: string, platforms: MetacriticPlatform[]): Pr
         }
     }
 
+    const releaseDate = reviewPage(reviewPage(".summary_detail.release_data .data").get(0)).text();
+
     return {
         name,
         url: reviewUrl,
         metascore: metascoreMax,
         userscore: userscoreMax,
+        releaseDate,
         metascoreUrl: bestMetascoreUrl,
         userscoreUrl: bestUserscoreUrl,
     };

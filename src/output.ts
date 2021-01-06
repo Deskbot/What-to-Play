@@ -21,6 +21,7 @@ export const csvHeaders = [
     "Metacritic Name",
     "Metacritic Critic Score",
     "Metacritic User Score",
+    "Metacritic Release Date",
     "Steam Name",
     "Steam All Time % Positive",
     "Steam Recent % Positive",
@@ -134,10 +135,11 @@ export async function getCsv(
         "Metacritic Name": bindUndefined(data.metacritic, m => toHyperlink(m.url, m.name)),
         "Metacritic Critic Score": data.metacritic?.metascore
             ? toHyperlink(data.metacritic.metascoreUrl!, data.metacritic.metascore)
-            : undefined,
+            : "",
         "Metacritic User Score": data.metacritic?.userscore
             ? toHyperlink(data.metacritic.userscoreUrl!, data.metacritic.userscore)
-            : undefined,
+            : "",
+        "Metacritic Release Date": data.metacritic?.releaseDate,
         "Steam Name": bindUndefined(data.steam, s => toHyperlink(s.url, s.name)),
         "Steam All Time % Positive": data.steam?.allTimeScore,
         "Steam Recent % Positive": data.steam?.recentScore,
