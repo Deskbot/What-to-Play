@@ -271,3 +271,9 @@ might not be a good idea to reject search results that have a large levenshtein 
 no single website has the best search engine there's advantages and disadvantages, so it's likely some columns will contain the wrong game, but the output tells you what game was found on the website and has links to the website, so you can check for yourself
 
 If there was a reliable search engine with all games and a good search engine, I would make that one decide what game to look at, but actually only metacritci and opencritic have everything and their search engines have big shortcomings;
+
+---
+
+rate limiting per website doesn't seem to add anything and also is making (gog,metacritic) some sites timeout (although because some sites are timing out that might mean without the timeout it'll be faster over all)
+
+It's stable enough and fast enough without it.
