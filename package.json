@@ -7,9 +7,10 @@
   "types": "build",
   "scripts": {
     "build": "tsc -i",
+    "clean": "rm -rf build",
     "main": "npm run build && node -r source-map-support/register build/main.js",
     "test": "testyts",
-    "prepublishOnly": "npm test"
+    "prepublishOnly": "npm run clean && npm run build && npm test"
   },
   "files": [
     "/bin",
