@@ -19,6 +19,13 @@ This program can be used:
 * on the command line reading from stdin or a file;
 * as an npm package.
 
+## Prerequisites
+
+* Install [NodeJS](https://nodejs.org/en/).
+* Install [NPM](https://www.npmjs.com/).
+
+If you're a non-technical person looking at this, I'm sorry. This code won't run in a browser due to browser security preventing requests between website. Although I could set something up on a server and have all the data downloaded on the server side, it would be too slow with multiple concurrent users due to the way these websites prevent spam by blocking too many requests from a single origin.
+
 ## Install
 
 Global:
