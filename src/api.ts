@@ -5,3 +5,4 @@ export * as metacritic from "./metacritic";
 export * as platform from "./platform";
 export * as search from "./search";
 export * as steam from "./steam";
+export * as util from "./util";
