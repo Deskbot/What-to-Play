@@ -26,48 +26,35 @@ This program can be used:
 
 If you're a non-technical person looking at this, I'm sorry. This code won't run in a browser due to browser security preventing requests between website. Although I could set something up on a server and have all the data downloaded on the server side, it would be too slow with multiple concurrent users due to the way these websites prevent spam by blocking too many requests from a single origin.
 
-## Install
+## How to Run
 
-Global:
+Run without install:
+
+```
+npx what-to-play ...
+```
+
+Global install:
 
 ```
 sudo npm install --global what-to-play
+what-to-play ...
 ```
 
-As a dependency:
+Dependency:
 
 ```
 npm install what-to-play
+npx what-to-play ...
 ```
 
-Download without installing:
+From source:
 
 ```
 git clone https://github.com/Deskbot/What-to-Play --depth 1
 cd What-to-Play
 npm install
 npm run build
-```
-
-## Command Line Usage
-
-### Command
-
-Global:
-
-```
-what-to-play ...
-```
-
-From dependency / Download and run:
-
-```
-npx what-to-play ...
-```
-
-From repository:
-
-```
 npm run main -- ...
 ```
 
