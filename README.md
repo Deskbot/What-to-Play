@@ -19,12 +19,12 @@ This program can be used:
 * on the command line reading from stdin or a file;
 * as an npm package.
 
+You can specify the gaming platforms you use to improve score relevancy, and you can improve search results by specifying your country.
+
 ## Prerequisites
 
 * Install [NodeJS](https://nodejs.org/en/).
 * Install [NPM](https://www.npmjs.com/).
-
-If you're a non-technical person looking at this, I'm sorry. This code won't run in a browser due to browser security preventing requests between website. Although I could set something up on a server and have all the data downloaded on the server side, it would be too slow with multiple concurrent users due to the way these websites prevent spam by blocking too many requests from a single origin.
 
 ## How to Run
 
@@ -87,6 +87,8 @@ See `src/api.ts` for what exactly is available.
 The main functions to look at are in `src/output.ts`. Functions for getting a subset of the output data are exposed under namespaces in `src/api.ts`.
 
 In terms of API stability. You can trust exports from `src/output.ts` to be less likely to change than other exports, but I'll try to keep to semantic versioning.
+
+This package depends on NodeJS libraries. It won't run in browser due to [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) policy implemented by browsers.
 
 ## Output
 
