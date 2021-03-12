@@ -26,6 +26,8 @@ You can specify the gaming platforms you use to improve score relevancy, and you
 * Install [NodeJS](https://nodejs.org/en/).
 * Install [NPM](https://www.npmjs.com/).
 
+If you're a non-technical person looking at this, I'm sorry. This code won't run in a browser due to browser security preventing requests between websites. Although I could set something up on a server and have all the data downloaded on the server side, it would be too slow with multiple concurrent users due to the way these websites prevent spam by blocking too many requests from a single origin.
+
 ## How to Run
 
 Run without install:
