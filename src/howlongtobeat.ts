@@ -1,8 +1,8 @@
 import * as cheerio from "cheerio";
 import fetch from "node-fetch";
 import * as querystring from "querystring";
-import { bug } from "./util";
 import { closestSearchResult } from "./search";
+import { bug } from "./util";
 
 export interface HowLongToBeatResult {
     name: string;
@@ -95,13 +95,16 @@ export async function getData(game: string): Promise<HowLongToBeatResult | undef
 async function getSearchPage(game: string): Promise<cheerio.Root> {
     const searchUrl = "https://howlongtobeat.com/search_results?page=1";
     const gameStr = querystring.escape(game);
-    const postData = `queryString=${gameStr}&t=games&sorthead=popular&sortd=Normal Order`;
+    const postData = `queryString=${gameStr}&t=games&sorthead=popular&sortd=0&plat=&length_type=main&length_min=&length_max=&v=&f=&g=&detail=&randomize=0`;
 
     const res = await fetch(searchUrl, {
         method: "POST",
         body: postData,
         headers: {
-            "Content-Type": "application/x-www-form-urlencoded"
+            "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:104.0) Gecko/20100101 Firefox/104.0",
+            "Content-Type": "application/x-www-form-urlencoded",
+            "Origin": "https://howlongtobeat.com",
+            "Referer": "https://howlongtobeat.com/",
         }
     });
 
