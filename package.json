@@ -41,6 +41,7 @@
   "dependencies": {
     "cheerio": "^1.0.0-rc.5",
     "fastest-levenshtein": "^1.0.12",
+    "howlongtobeat": "^1.7.0",
     "js-lcs": "^1.0.1",
     "minimist": "^1.2.5",
     "node-fetch": "^2.6.1"
