@@ -1,9 +1,9 @@
 import * as cheerio from "cheerio";
 import fetch from "node-fetch";
 import * as querystring from "querystring";
-import { bug, nonNaN } from "./util";
+import { MetacriticPlatform, toPlatform } from "./platform";
 import { closestSearchResult } from "./search";
-import { MetacriticPlatform } from "./platform";
+import { bug, nonNaN } from "./util";
 
 type BothScores = Pick<MetacriticResult, "metascore" | "userscore">;
 
@@ -28,8 +28,13 @@ export interface MetacriticResult {
 
 interface TargetGame {
     name: string;
-    platform: MetacriticPlatform;
     reviewUrl: string;
+}
+
+interface Score {
+    platform: MetacriticPlatform
+    metascore: number
+    url: string | undefined
 }
 
 function absoluteUrl(relativeUrl: string): string {
@@ -44,57 +49,61 @@ export async function getData(game: string, platforms: MetacriticPlatform[]): Pr
     const productData = await search(game);
     if (productData === undefined) return undefined;
 
-    const { name, platform, reviewUrl } = productData;
+    const { name, reviewUrl } = productData;
 
-    // get scores from product pages
+    // get metascores from product page
 
     const reviewPageText = await fetch(reviewUrl).then(res => res.text());
-    const reviewPage = cheerio.load(reviewPageText);
-
-    // get promises that return the score on each wanted platform
-
-    // get other review pages for other platforms from the initial review page
-    const scorePromises = getOtherPlatformUrls(reviewPage, platforms)
-        .map(url => awaitPair([url, getScoresByUrl(url)]));
-
-    // add the starting page score if it is for a platform we want
-    if (platforms.includes(platform)) {
-        scorePromises.push(awaitPair([reviewUrl, getScores(reviewPage)]));
-    }
-
-    // aggregate scores from all platforms
-
-    const scores = await Promise.all(scorePromises);
+    const $ = cheerio.load(reviewPageText);
 
     let metascoreMax: number | undefined;
-    let userscoreMax: number | undefined;
-    let bestMetascoreUrl: string | undefined;
-    let bestUserscoreUrl: string | undefined;
+    let bestMetascore: Score | undefined;
 
-    for (const [url, { metascore, userscore }] of scores) {
+    for (const scoreElem of $(".c-gamePlatformsSection_list")) {
+        const $scoreElem = $(scoreElem)
+
+        const platform = toPlatform($scoreElem.find("title").first().text().trim())
+
+        // only look at scores for platforms the user has asked for
+        if (!platform || !platforms.includes(platform)) {
+            continue
+        }
+
+        const metascore = parseInt($scoreElem.find(".c-siteReviewScore").text().trim())
+
+        const score: Score = {
+            platform,
+            metascore,
+            url: $scoreElem.attr("href")
+        }
+
         // undefined compared (> or <) with undefined or with a number
         // always results in false
 
         if ((metascore as number) > (metascoreMax as number) || metascoreMax === undefined) {
-            metascoreMax = metascore;
-            bestMetascoreUrl = url;
-        }
-        if ((userscore as number) > (userscoreMax as number) || userscoreMax === undefined) {
-            userscoreMax = userscore;
-            bestUserscoreUrl = url;
+            metascoreMax = metascore
+            bestMetascore = score
         }
     }
 
-    const releaseDate = reviewPage(reviewPage(".summary_detail.release_data .data").get(0)).text();
+    const userscore = parseInt($(".c-siteReviewScore").text().trim())
+
+    let releaseDate: string | undefined
+    for (const elem of $(".c-productHero_score-container").find(".g-text-bold")) {
+        const $elem = $(elem)
+        if ($elem.text().trim() === "Released On:") {
+            releaseDate = $elem.siblings("span").first().text().trim()
+        }
+    }
 
     return {
         name,
         url: reviewUrl,
-        metascore: metascoreMax,
-        userscore: userscoreMax,
-        releaseDate,
-        metascoreUrl: bestMetascoreUrl,
-        userscoreUrl: bestUserscoreUrl,
+        metascore: bestMetascore?.metascore,
+        userscore,
+        releaseDate: releaseDate ?? "",
+        metascoreUrl: bestMetascore?.url,
+        userscoreUrl: reviewUrl,
     };
 }
 
@@ -157,24 +166,27 @@ function platformFromRelativeUrl(url: string): MetacriticPlatform {
 
 async function search(game: string): Promise<TargetGame | undefined> {
     const gameStr = querystring.escape(game);
-    const searchUrl = `https://www.metacritic.com/search/game/${gameStr}/results`;
+    const searchUrl = `https://www.metacritic.com/search/${encodeURI(gameStr)}?category=13`;
 
     const searchPageText = await fetch(searchUrl).then(res => res.text());
     const searchPage = cheerio.load(searchPageText);
 
-    const searchResults = searchPage(".main_stats").find("a")
+    const searchResults = searchPage(".c-pageSiteSearch-results")
+        .find(".c-pageSiteSearch-results-item")
         .toArray()
         .map(searchPage);
+
+    const getNameForResult = (result: cheerio.Cheerio) => result.find("p").first().text().trim()
 
     const bestResult = closestSearchResult(
         game,
         searchResults,
-        product => product.text().trim()
+        getNameForResult
     );
 
     if (!bestResult) return undefined;
 
-    const name = bestResult.text().trim();
+    const name = getNameForResult(bestResult)
 
     const href = bestResult.attr("href");
     if (!href) bug();
@@ -182,11 +194,8 @@ async function search(game: string): Promise<TargetGame | undefined> {
     const reviewUrl = absoluteUrl(href);
     if (!reviewUrl) bug();
 
-    const platform = platformFromRelativeUrl(href);
-
     return {
         name,
-        platform,
         reviewUrl,
     }
 }
