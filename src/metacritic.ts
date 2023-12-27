@@ -41,10 +41,6 @@ function absoluteUrl(relativeUrl: string): string {
     return "https://www.metacritic.com" + relativeUrl;
 }
 
-async function awaitPair<A, B>([a, promiseB]: [A, Promise<B>]): Promise<[A, B]> {
-    return [a, await promiseB];
-}
-
 export async function getData(game: string, platforms: MetacriticPlatform[]): Promise<MetacriticResult | undefined> {
     const productData = await search(game);
     if (productData === undefined) return undefined;
@@ -59,7 +55,7 @@ export async function getData(game: string, platforms: MetacriticPlatform[]): Pr
     let metascoreMax: number | undefined;
     let bestMetascore: Score | undefined;
 
-    for (const scoreElem of $(".c-gamePlatformsSection_list")) {
+    for (const scoreElem of $(".c-gamePlatformsSection_list .c-gamePlatformTile")) {
         const $scoreElem = $(scoreElem)
 
         const platform = toPlatform($scoreElem.find("title").first().text().trim())
@@ -86,7 +82,8 @@ export async function getData(game: string, platforms: MetacriticPlatform[]): Pr
         }
     }
 
-    const userscore = parseInt($(".c-siteReviewScore").text().trim())
+    const $userScore = $(".c-productScoreInfo .c-productScoreInfo_scoreContent .c-productScoreInfo_scoreNumber .c-siteReviewScore_background-user")
+    const userscore = parseInt($userScore.text().trim())
 
     let releaseDate: string | undefined
     for (const elem of $(".c-productHero_score-container").find(".g-text-bold")) {
@@ -105,63 +102,6 @@ export async function getData(game: string, platforms: MetacriticPlatform[]): Pr
         metascoreUrl: bestMetascore?.url,
         userscoreUrl: reviewUrl,
     };
-}
-
-function getOtherPlatformUrls(page: cheerio.Root, platforms: MetacriticPlatform[]): string[] {
-    const urls = [] as string[];
-
-    page(".product_platforms")
-        .first()
-        .find("a")
-        .each((_, elem) => {
-            const tagElem = elem as cheerio.TagElement;
-            const href = tagElem.attribs && tagElem.attribs["href"];
-            if (!href) bug();
-
-            const platform = platformFromRelativeUrl(href);
-
-            if (platforms.includes(platform)) {
-                urls.push(absoluteUrl(href));
-            }
-        });
-
-    return urls;
-}
-
-async function getScores(scorePage: cheerio.Root): Promise<BothScores> {
-    const metascoreStr =
-        scorePage(".product_scores")
-            .find(".main_details") // different
-            .find(".metascore_w")
-            .find("span") // different
-            .first()
-            .text()
-            .trim();
-
-    const userscoreStr =
-        scorePage(".product_scores")
-            .find(".side_details") // different
-            .find(".metascore_w")
-            .first()
-            .text()
-            .trim();
-
-    return {
-        metascore: nonNaN(parseFloat(metascoreStr), undefined),
-        userscore: nonNaN(parseFloat(userscoreStr), undefined),
-    };
-}
-
-async function getScoresByUrl(scoreUrl: string): Promise<BothScores> {
-    const scorePageText = await fetch(scoreUrl).then(res => res.text());
-    const scorePage = cheerio.load(scorePageText);
-    return getScores(scorePage);
-}
-
-/** url looks like: /game/platform-name/game-name */
-function platformFromRelativeUrl(url: string): MetacriticPlatform {
-    return url.split("/")[2] as MetacriticPlatform
-        ?? bug();
 }
 
 async function search(game: string): Promise<TargetGame | undefined> {
