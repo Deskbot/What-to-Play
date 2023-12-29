@@ -1,5 +1,5 @@
-import { closestSearchResult } from "./search";
 import { HowLongToBeatService } from 'howlongtobeat';
+import { closestSearchResult } from "./search";
 
 const hltbService = new HowLongToBeatService();
 
@@ -29,10 +29,15 @@ export async function getData(game: string): Promise<HowLongToBeatResult | undef
     return {
         name: bestResult?.name,
         times: {
-            mainStory: bestResult?.gameplayMain,
-            mainPlusExtra: bestResult?.gameplayMainExtra,
-            completionist: bestResult?.gameplayCompletionist,
+            mainStory: nonZero(bestResult?.gameplayMain),
+            mainPlusExtra: nonZero(bestResult?.gameplayMainExtra),
+            completionist: nonZero(bestResult?.gameplayCompletionist),
         },
         url: `https://howlongtobeat.com/game/${bestResult.id}`
     }
+}
+
+function nonZero(num: number | undefined): number | undefined {
+    if (num === 0) return undefined
+    return num
 }
