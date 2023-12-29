@@ -1,5 +1,5 @@
 import { closestSearchResult } from "./search";
-import { HowLongToBeatService, HowLongToBeatEntry } from 'howlongtobeat';
+import { HowLongToBeatService } from 'howlongtobeat';
 
 let hltbService = new HowLongToBeatService();
 
@@ -27,9 +27,10 @@ export async function getData(game: string): Promise<HowLongToBeatResult | undef
         searchResult => searchResult.name
     )
 
-    
-    if (bestResult == undefined) return undefined
-    
+    if (bestResult == undefined) {
+        return undefined
+    }
+
     const correctType: HowLongToBeatResult = {
         name: bestResult?.name,
         times: {
