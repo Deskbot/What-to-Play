@@ -26,7 +26,7 @@ export async function getData(game: string): Promise<HowLongToBeatResult | undef
         return undefined
     }
 
-    const correctType: HowLongToBeatResult = {
+    return {
         name: bestResult?.name,
         times: {
             mainStory: bestResult?.gameplayMain,
@@ -35,6 +35,4 @@ export async function getData(game: string): Promise<HowLongToBeatResult | undef
         },
         url: `https://howlongtobeat.com/game/${bestResult.id}`
     }
-
-    return correctType
 }
