@@ -32,9 +32,6 @@ export const csvHeaders = [
     "How Long to Beat: Main Story",
     "How Long to Beat: Main Story + Extra",
     "How Long to Beat: Completionist",
-    "How Long to Beat: Solo",
-    "How Long to Beat: Co-Op",
-    "How Long to Beat: Vs.",
 ] as const;
 export const csvHeaderRow = csvHeaders.join(",");
 
@@ -150,9 +147,6 @@ export async function getCsv(
         "How Long to Beat: Main Story": data.hltb?.times.mainStory,
         "How Long to Beat: Main Story + Extra": data.hltb?.times.mainPlusExtra,
         "How Long to Beat: Completionist": data.hltb?.times.completionist,
-        "How Long to Beat: Solo": data.hltb?.times.solo,
-        "How Long to Beat: Co-Op": data.hltb?.times.coop,
-        "How Long to Beat: Vs.": data.hltb?.times.vs,
     };
 
     // iterate through in the same order every time guaranteed
