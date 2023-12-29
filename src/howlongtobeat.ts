@@ -1,7 +1,7 @@
 import { closestSearchResult } from "./search";
 import { HowLongToBeatService } from 'howlongtobeat';
 
-let hltbService = new HowLongToBeatService();
+const hltbService = new HowLongToBeatService();
 
 export interface HowLongToBeatResult {
     name: string;
